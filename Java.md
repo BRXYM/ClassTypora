@@ -124,6 +124,7 @@
 - **方法名：所有字母均为小写。如果方法名由多个单词组成，则从第二个单词开始每个单词首字母大写，其它字母均为小写。如：equals()，setUserName()，getUserAge()**。
 - **包名：所有字母均为小写。如：org.springframework.boot、com.mysql.cj.driver。**
 - **使用static final修饰的常量：所有字母均为大写。如果由多个单词组成，单词之间使用下划线分隔。如：MAX_VALUE、RED**。
+- **泛型名：只有一个大写字母。如：K、V、E**。
 
 
 
@@ -385,7 +386,7 @@
 - **逻辑与(&)/逻辑或(|)**(*)
   
   - **逻辑与：当第一个表达式为false时，仍然执行第二个表达式，再返回false。效率低，安全性差。**
-- **逻辑或：当第一个表达式为true时，仍然执行第二个表达式，再返回true。效率低，安全性差。**
+  - **逻辑或：当第一个表达式为true时，仍然执行第二个表达式，再返回true。效率低，安全性差。**
   
 - **短路与(&&)/短路或(||)**(*)
 
@@ -1138,7 +1139,6 @@
   - **当形参为引用数据类型时，形参改变实参通常也会改变**。
   
     ```java
-    
     public class Test1020 {
     
     	public static void main(String[] args) {
@@ -1171,8 +1171,8 @@
     }
     
     ```
-  
-    ![image-20231023084500734](D:\华信教育\2023下\Java\images\9-10\image-20231023084500734.png)
+    
+  ![image-20231023084500734](D:\华信教育\2023下\Java\images\9-10\image-20231023084500734.png)
 
 ### 可变长参数
 
@@ -1245,9 +1245,9 @@
 
 ### 封装
 
-- 类的**成员变量**使用**private**修饰。
+- 类的**成员变量**使用**private**修饰，**隐藏类实现的细节**。
 
-- 根据需求，为私有的成员变量提供公有的getters**或**setters方法。
+- 根据需求，为私有的成员变量提供公有的getters**或**setters方法，**提供对外访问的接口**。
 
 - **封装可以提高程序的安全性**。
 
@@ -1519,7 +1519,7 @@
 
 - 重写方法的**访问权限**必须**大于等于**被重写方法的访问权限。
 
-- 管理方法声明的**异常**必须**小于等于**被重写方法声明的异常。
+- 重写方法声明的**异常**必须**小于等于**被重写方法声明的异常。
 
 - static不能产生重写。
 
@@ -1601,7 +1601,7 @@
 
 - 通常情况下，子类会在自己**构造方法**的**第一行**，默认使用**super()**调用父类**无参**的构造方法。
 
-- **当父类没有无参的构造方法时，子类必须在自己构造方法的第一行调用父类有参数的构造方法，否则编译失败**。
+- **当父类没有无参的构造方法时，子类必须在自己构造方法的第一行，手动调用父类有参数的构造方法，否则编译失败**。
 
   ```java
   package com.test1102;
@@ -2064,175 +2064,931 @@
 ## Lambda表达式
 
 - 从JDK1.8开始出现。
-- 函数式接口
-  - **有且只有一个抽象方法的接口。**
-  - **@FunctionalInterface注解：检查接口是否为函数式接口。**
 
-- lambda表达式：语法糖。**简化代码，不能提高程序运行效率**
+- 函数式接口
+  - **有且只有一个抽象方法的接口。(*)**
+  - **@FunctionalInterface注解：检查接口是否为函数式接口。**
+  
+- Lambda表达式：语法糖。
+
   - 当方法只有一个参数时，参数列表的小括号可以省略。
   - 当方法体中只有一行代码，大括号可以省略。
   - 当大括号省略时，return关键字必须省略。
 
-```java
-package DJTUClass.java_20231123;
+  ```java
+  package com.test1123;
+  
+  public class Test {
+  	public static void main(String[] args) {
+  //		TestInterface1 t1 = new TestInterface1() {
+  //			@Override
+  //			public void test() {
+  //				System.out.println("没有返回类型，没有参数");
+  //			}
+  //		};
+  		TestInterface1 t1 = () -> System.out.println("没有返回类型，没有参数");
+  		t1.test();
+  
+  //		TestInterface2 t2 = new TestInterface2() {
+  //			@Override
+  //			public void test(int num1) {
+  //				System.out.println("没有返回类型，有一个参数：" + num1);
+  //			}
+  //		};
+  		TestInterface2 t2 = n -> System.out.println("没有返回类型，有一个参数：" + n);
+  		t2.test(100);
+  
+  //		TestInterface3 t3 = new TestInterface3() {
+  //			@Override
+  //			public void test(int num1, int num2) {
+  //				System.out.println("没有返回类型，两个参数的和：" + (num1 + num2));
+  //			}
+  //		};
+  		TestInterface3 t3 = (n,m) -> System.out.println("没有返回类型，两个参数的和：" + (n + m));
+  		t3.test(100, 200);
+  
+  //		TestInterface4 t4 = new TestInterface4() {
+  //			@Override
+  //			public int test() {
+  //				return (int) (Math.random() * 100 + 1);
+  //			}
+  //		};
+  		TestInterface4 t4 = () -> (int) (Math.random() * 100 + 1);
+  		System.out.println(t4.test());
+  
+  //		TestInterface5 t5 = new TestInterface5() {
+  //			@Override
+  //			public int test(int num1) {
+  //				return num1 * 100;
+  //			}
+  //		};
+  		TestInterface5 t5 = n -> n * 100;
+  		System.out.println(t5.test(200));
+  
+  //		TestInterface6 t6 = new TestInterface6() {
+  //			@Override
+  //			public int test(int num1, int num2) {
+  //				return num1 * num2;
+  //			}
+  //		};
+  		TestInterface6 t6 = (n,m) -> n * m;
+  		System.out.println(t6.test(100, 200));
+  	}
+  }
+  
+  @FunctionalInterface
+  interface TestInterface1 {
+  	public abstract void test();
+  }
+  
+  @FunctionalInterface
+  interface TestInterface2 {
+  	public abstract void test(int num1);
+  }
+  
+  @FunctionalInterface
+  interface TestInterface3 {
+  	public abstract void test(int num1, int num2);
+  }
+  
+  @FunctionalInterface
+  interface TestInterface4 {
+  	public abstract int test();
+  }
+  
+  @FunctionalInterface
+  interface TestInterface5 {
+  	public abstract int test(int num1);
+  }
+  
+  @FunctionalInterface
+  interface TestInterface6 {
+  	public abstract int test(int num1, int num2);
+  }
+  
+  ```
 
-public class Test {
-    public static void main(String[] args) {
-//        TestInterface1 testInterface1 = new TestInterface1() {
-//            @Override
-//            public void test() {
-//                System.out.println("没有返回类型，没有参数");
-//            }
-//        };
-        TestInterface1 testInterface1 = () -> {
-            System.out.println("没有返回类型，没有参数");
-        };
-        testInterface1.test();
-//        TestInterface2 testInterface2 = new TestInterface2() {
-//            @Override
-//            public void test(int num1) {
-//                System.out.println("没有返回类型，有一个参数" + num1);
-//            }
-//        };
-        TestInterface2 testInterface2 = num1 -> {
-            System.out.println("没有返回类型，有一个参数" + num1);
+- 示例
 
-        };
-        testInterface2.test(100);
-//        TestInterface3 testInterface3 = new TestInterface3() {
-//            @Override
-//            public void test(int num1, int num2) {
-//                System.out.println("没有返回类型，有两个参数" + num1 + num2);
-//            }
-//        };
-        TestInterface3 testInterface3 = (num1, num2) -> {
-            System.out.println("没有返回类型，有两个参数" + (num1 + num2));
-        };
-        testInterface3.test(100, 200);
-
-//        TestInterface4 testInterface4 = new TestInterface4() {
-//            @Override
-//            public int test() {
-//                return (int) (Math.random() * 100 + 1);
-//            }
-//        };
-        TestInterface4 testInterface4 = () -> (int) (Math.random() * 100 + 1);
-        System.out.println(testInterface4.test());
-
-//        TestInterface5 testInterface5 = new TestInterface5() {
-//            @Override
-//            public int test(int num1) {
-////                return num1 * num2;
-//                return num1;
-//            }
-//        };
-        TestInterface5 testInterface5 = n -> n * 100;
-        System.out.println(testInterface5.test(200));
-
-        TestInterface6 testInterface6 = (n,m)->n*m;
-        System.out.println(testInterface6.test(100,200));
-    }
-
-    @FunctionalInterface
-    interface TestInterface1 {
-        public abstract void test();
-    }
-
-    @FunctionalInterface
-    interface TestInterface2 {
-        public abstract void test(int num1);
-    }
-
-    @FunctionalInterface
-    interface TestInterface3 {
-        public abstract void test(int num1, int num2);
-    }
-
-    @FunctionalInterface
-    interface TestInterface4 {
-        public abstract int test();
-    }
-
-    @FunctionalInterface
-    interface TestInterface5 {
-        public abstract int test(int num1);
-    }
-
-    @FunctionalInterface
-    interface TestInterface6 {
-        public abstract int test(int num1,int num2);
-    }
-}
-
-```
-
-```java
-package DJTUClass.java_20231123;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.function.Consumer;
-
-public class TestSort {
-    public static void main(String[] args) {
-        // 创建长度为10的数组，用于保存十个用户的信息
-        User[] userArray = new User[10];
-
-        //使用循环向数组中添加10个用户信息
-        for (int i = 0; i < userArray.length; i++) {
-            //创建新用户
-            User user = new User();
-            //设置新用户的名字与年龄
-            user.setUserName("User" + i);
-            user.setUserAge((int) (Math.random() * 100 + 1));
-            userArray[i] = user;
-        }
-        for (User user : userArray) {
-            System.out.println(user);
-        }
-
-        //输出排序前用户信息->lambda表达式
-//        Arrays.stream(userArray).forEach(new Consumer<User>() {
-//            @Override
-//            public void accept(User user) {
-//
-//            }
-//        });
-//        Arrays.stream(userArray).forEach(user -> System.out.println(user));
-        System.out.println("-----------------------");
-        Arrays.stream(userArray).forEach(System.out::println);
-        System.out.println("-----------------------");
-
-        //排序用户的信息,根据用户的年龄进行排序
-//        Arrays.sort(userArray, new Comparator<User>() {
-//            /**
-//             * 当第一个参数大于第二个参数，返回正数
-//             * 当第一个参数小于第二个参数，返回负数
-//             * 当第一个参数等于第二个参数，返回0
-//             * @param o1 the first object to be compared.
-//             * @param o2 the second object to be compared.
-//             * @return
-//             */
-//            @Override
-//            public int compare(User o1, User o2) {
-//                if (o1.getUserAge() > o2.getUserAge()) {
-//                    return 1;
-//                } else if (o1.getUserAge() < o2.getUserAge()) {
-//                    return -1;
-//               } else {
-//                    return 0;
-//                }
-//            }
-//        });
-        Arrays.sort(userArray, ((o1, o2) -> o1.getUserAge() - o2.getUserAge()));
-        //输出排序后的用户信息
-        System.out.println("------------------------");
-        Arrays.stream(userArray).forEach(user -> System.out.println(user));
-
-    }
-}
-
-```
+  ```java
+  package com.test1123;
+  
+  import java.util.Arrays;
+  import java.util.Comparator;
+  
+  public class TestSort {
+  
+  	public static void main(String[] args) {
+  		// 创建长度为10的数组，用于保存10个用户信息
+  		User[] userArray = new User[10];
+  
+  		// 使用循环向数组中添加10个用户信息
+  		for (int i = 0; i < userArray.length; i++) {
+  			// 创建新用户
+  			User user = new User();
+  			// 设置新用户的名字与年龄
+  			user.setUserName("User" + i);
+  			user.setUserAge((int) (Math.random() * 100 + 1));
+  			// 将新用户添加到用户数组中
+  			userArray[i] = user;
+  		}
+  
+  		// 输出排序前用户信息 -> forEach循环
+  		for (User user : userArray) {
+  			System.out.println(user);
+  		}
+  		System.out.println("-----------------------");
+  		// 输出排序前用户信息 -> Lambda表达式
+  //		Arrays.stream(userArray).forEach(new Consumer<User>() {
+  //			@Override
+  //			public void accept(User t) {
+  //				System.out.println(t);
+  //			}
+  //		});
+  		Arrays.stream(userArray).forEach(t -> System.out.println(t));
+  
+  		// 根据用户年龄，对用户数组进行排序
+  //		Arrays.sort(userArray,new Comparator<User>() {
+  //			/*
+  //			 * 当第一个参数大于第二个参数，返回正数
+  //			 * 当第一个参数小于第二个参数，返回负数
+  //			 * 当第一个参数等于第二个参数，返回0
+  //			 */
+  //			@Override
+  //			public int compare(User o1, User o2) {	
+  //				if(o1.getUserAge() > o2.getUserAge()) {
+  //					return 1;
+  //				} else if (o1.getUserAge() < o2.getUserAge()) {
+  //					return -1;
+  //				} else {
+  //					return 0;
+  //				}
+  //			}
+  //		});
+  		Arrays.sort(userArray, (o1, o2) -> o1.getUserAge() - o2.getUserAge());
+  		
+  		// 输出排序后的用户信息
+  		System.out.println("--------------------");
+  		Arrays.stream(userArray).forEach(t -> System.out.println(t));
+  
+  	}
+  
+  }
+  
+  ```
 
 
 
+
+## 异常处理
+
+### 异常结构
+
+<img src="D:\华信教育\2023下\Java\images\9-10\image-20231130135447370.png" alt="image-20231130135447370" style="zoom:67%;" />
+
+- **java.lang.Throwable类：是Java中所有错误与异常的父类。**
+- **java.lang.Error类：是应用程序不应该捕获或处理的严重的问题。**
+- **java.lang.Exception类：是应用程序应该捕获与处理的异常。**
+- **非运行时异常：在编写程序时，必须捕获或处理的异常。否则.java文件无法编译为.class文件，程序不能运行。**
+- **java.lang.RuntimeException及其子类(运行时异常)：在编写程序时，可以不捕获与处理的异常。程序可以运行，但运行时可能抛出异常。**
+
+
+
+### try..catch..finally
+
+- 格式
+
+  ```java
+  try {
+      // 捕获异常，存放可能发生异常的代码。
+  } catch (Throwable 参数名) {
+      // 处理异常，存放处理异常的代码。
+  } finally {
+      // 一定执行的代码。
+  }
+  ```
+
+- **try块不能单独使用**，必须与catch**或**finally块一起使用。
+
+- 一个try语句中可以出现0个或N个catch块。
+
+- 当try块中没有抛出异常时，catch块中的代码不会执行。
+
+- **当try块中的代码抛出异常时，try块中的代码会终止执行。跳转到catch块中处理异常。**
+
+- **可以使用Exception在catch块中处理所有的异常。**
+
+- **Exception必须出现在最后一个catch块中。**
+
+- **无论程序是否发生异常，finally块中的代码一定会执行。**
+
+- **如果try语句中存在finally块，try与catch块中的return语句会暂停执行，等待finally块执行完毕后，再继续执行return语句。**
+
+- **工作中不推荐在finally块中出现return语句。如果finally块中出现return语句，则try与catch中的return语句全部失效。**
+
+  ```java
+  package com.test1130;
+  
+  public class TestFinally {
+  
+  	public static void main(String[] args) {
+  		int i = method();
+  		System.out.println(i);
+  	}
+  
+  	public static int method() {
+  		try {
+  			System.out.println("try……");
+  			return 1;
+  		} catch (Exception e) {
+  			System.out.println("catch……");
+  			return 2;
+  		} finally {
+  			System.out.println("finally……");
+  			return 3;
+  		}
+  	}
+  }
+  
+  ```
+
+- **请写出final、finally、finalize()的区别？(*)**
+
+  - **final关键字**
+    - **修饰常量：只能赋值一次。**
+    - **修饰方法：方法不能被重写。**
+    - **修饰类：类不能被继承。**
+  - **finally：Java异常处理的一部分。无论程序是否发生异常，finally中的代码一定会执行。**
+  - **finalize()方法(析构方法)：Object类提供的方法。当垃圾回收器销毁对象之前，自动调用此方法，释放内存。**
+
+
+
+### throw与throws关键字(*)
+
+- throw：在**方法体的内部**，手动抛出**一个**异常。可以结束方法。
+- throw**s**：在**方法声明的最后**，说明调用此方法时，方法可能会抛出**哪些**异常。
+
+
+
+### 异常与方法的重写
+
+- **当父类被重写的方法声明了1个或N个异常时，子类重写的方法可以声明0个异常**。
+
+- **当子类重写的方法也声明了异常时，子类重写的方法可以声明与父类相同的异常，或父类声明异常的子异常**。
+
+  ```java
+  package com.test1204;
+  
+  import java.io.IOException;
+  
+  public class Person {
+  
+  	public void method() throws IOException {
+  		System.out.println("父类的方法");
+  	}
+  }
+  
+  package com.test1204;
+  
+  import java.io.IOException;
+  import java.util.zip.ZipException;
+  
+  import javax.annotation.processing.FilerException;
+  
+  public class Student extends Person {
+  
+  	// ZipException,FilerException是IOException的子异常
+  	public void method() throws IOException,ZipException,FilerException {
+  		System.out.println("子类的方法");
+  	}
+  }
+   
+  
+  ```
+
+
+
+### 异常与构造方法
+
+- **构造方法也可以使用throws声明异常。**
+
+- **当父类的构造方法声明了异常时，子类的构造方法可必须声明相同的异常，或父类声明异常的父异常。**
+
+  ```java
+  package com.test1204;
+  
+  import java.io.IOException;
+  
+  public class Person {
+  	
+  	public Person() throws IOException {		
+  	}
+  }
+  
+  package com.test1204;
+  
+  import java.io.IOException;
+  import java.util.zip.ZipException;
+  
+  import javax.annotation.processing.FilerException;
+  
+  public class Student extends Person {
+  	
+  	public Student() throws IOException,Exception {
+  		super();
+  	}
+  }
+   
+  
+  ```
+
+
+
+### 创建自定义的异常类(*)
+
+- **使类继承于Exception或Exception的子类**。
+
+
+
+## 常用类
+
+### 包装类(装箱类)
+
+- Java中有8个包装类。
+
+- 包装类可以提供对应数据类型常用的属性与方法。
+
+- 包装类：**Byte、Short、Long、Float、Double、Boolean、Integer、Character**。
+
+- **装箱与拆箱(*)**
+
+  - **装箱：将基本数据类型转换为包装类。**
+  - **拆箱：将包装类转换为基本数据类型。**
+  - **从JDK1.5开始，Java可以自动装箱与拆箱。**
+  - **自动装箱与拆箱可以简化代码，但不会提高程序进行的效率。**
+
+- **使用包装类的parseXXX()方法，可以将String转换为对应的基本数据类型。**
+
+- **使用包装类的valueOf()方法，可以将String转换为对应的包装类。**
+
+  ```java
+  package com.test1207;
+  
+  public class Test {
+  
+  	public static void main(String[] args) {
+  		// 提供与类型相关的属性
+  		System.out.println(Integer.MAX_VALUE);
+  		System.out.println(Long.MIN_VALUE);
+  		System.out.println(Double.MAX_VALUE);
+  		// 提供与类型相关的方法
+  		System.out.println(Integer.toBinaryString(100)); // 十进制转换二进制
+  		System.out.println(Integer.toOctalString(100));  // 十进制转换八进制
+  		System.out.println(Integer.toHexString(100));    // 十进制转换十六进制
+  		
+  		int num1 = 100;
+  		// 装箱
+  		Integer num2 = Integer.valueOf(num1);
+  		// 拆箱
+  		int num3 = num2.intValue();
+  		
+  		// 自动装箱
+  		Integer num4 = 100;
+  		// 自动装箱
+  		int num5 = num4;
+  		
+  		String s = "100";
+  		// 将String转换为基本数据类型
+  		int x = Integer.parseInt(s);
+  		System.out.println(x);		
+  		double y = Double.parseDouble(s);
+  		System.out.println(y);		
+  		float z = Float.parseFloat(s);
+  		System.out.println(z);
+  		
+  		String s1 = "2000";
+  		// 将String转换为包装类
+  		Integer x1 = Integer.valueOf(s1);
+  		System.out.println(x1);
+  		Double y1 = Double.valueOf(s1);
+  		System.out.println(y1);
+  		Float z1 = Float.valueOf(s1);
+  		System.out.println(z1);
+  	}
+  }
+  
+  ```
+
+  
+
+### 大数字
+
+- java.math.BigInteger：大整数。
+
+- java.math.BigDecimal：大浮点数，在进行浮点数运算时，不会产生误差。
+
+  ```java
+  BigDecimal num1 = new BigDecimal("6987984654968743651354874651684.654326359856543213568");
+  BigDecimal num2 = new BigDecimal("2334566888136576434658468531323.546897632131687635416");
+  
+  // 加
+  System.out.println(num1.add(num2));
+  // 减
+  System.out.println(num1.subtract(num2));
+  // 乘
+  System.out.println(num1.multiply(num2));
+  // 除
+  System.out.println(num1.divide(new BigDecimal(2)));
+  ```
+
+
+
+### java.util.Date类
+
+- java.util.Date类：日期类。通常用于获得当前日期+时间，或用于日期的比较。
+
+  ```java
+  // 获得当前日期+时间
+  Date date = new Date();
+  System.out.println(date);
+  
+  // getTime()返回类型为long类型，从1970-1-1 00:00:00到创建Date对象之间的毫秒数
+  System.out.println(date.getTime());
+  // 日期比较
+  Date date1 = new Date();
+  // 判断date是否早于date1
+  System.out.println(date.before(date1));
+  // 判断date是否晚于date1
+  System.out.println(date.after(date1));
+  // 判断date是否等于date1
+  System.out.println(date.equals(date1));
+  ```
+
+### java.util.Calendar类
+
+- java.util.Calendar类：日历类，通常用于查询日期详细信息，或用于日期的计算。
+
+  ```java
+  Calendar c = Calendar.getInstance();
+  // 获得日期详细信息
+  System.out.println(c);
+  System.out.println(c.get(Calendar.YEAR));
+  System.out.println(c.get(Calendar.MONTH) + 1);
+  System.out.println(c.get(Calendar.DATE));
+  System.out.println(c.get(Calendar.DAY_OF_YEAR));
+  System.out.println(c.get(Calendar.WEEK_OF_YEAR));
+  // 日期计算：通常用于自动计算截止时间
+  c.add(Calendar.MONTH, 24);
+  System.out.println(c.get(Calendar.YEAR));
+  System.out.println(c.get(Calendar.MONTH) + 1);
+  System.out.println(c.get(Calendar.DATE));
+  ```
+
+  
+
+
+
+### java.text.DateFormat类及其子类
+
+- java.text.DateFormat类及其子类：通常用于，Date与String的转换。
+
+  ```java
+  // 创建SimpleDateFormat的对象，并设置日期的格式
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  Date date2 = new Date();
+  // 将Date转换为String
+  String s = sdf.format(date2);
+  System.out.println(s);
+  
+  s = "2020-10-20 15:36:47";
+  // 将String转换为Date
+  try {
+      date2 = sdf.parse(s);
+      System.out.println(date2);
+  } catch (ParseException e) {
+      System.out.println("日期格式不正确！！！");
+  }
+  ```
+
+
+
+### java.time.LocalDate、java.time.LocalTime、java.time.LocalDateTime类
+
+- 这三个类从JDK1.8开始出现。
+
+- 这三个类均为**不可变**的并且是**线程安全**的。
+
+  ```java
+  // 获得当前日期+时间
+  LocalDateTime dateTime = LocalDateTime.now();
+  System.out.println(dateTime);
+  
+  // 获得日期详细信息
+  System.out.println(dateTime.getYear());
+  System.out.println(dateTime.getMonth()); // 获得月份(英文)
+  System.out.println(dateTime.getMonthValue()); // 获得月份(数字)
+  System.out.println(dateTime.getDayOfMonth());
+  System.out.println(dateTime.getDayOfYear());
+  
+  // 日期计算		
+  System.out.println(dateTime.plusDays(100));  // 加天
+  System.out.println(dateTime.plusDays(-100)); // 减天
+  System.out.println(dateTime.plusMonths(24)); // 加月
+  ```
+
+
+
+
+### 泛型
+
+- 从JDK1.5开始出现。
+
+- **泛型的作用：后期绑定数据类型。**
+
+- **如果没有指定泛型的类型，泛型默认为java.lang.Object类**。
+
+- **X extends Y：设置泛型X只能为Y或Y子类的类型。**
+
+- **X super Y：设置泛型X是Y或Y的父类类型。**
+
+- **泛型只能使用引用数据类型。**
+
+  ```java
+  package com.test1214;
+  
+  public class Point<T extends Number> {
+  
+  	private T x;
+  	private T y;
+  
+  	public T getX() {
+  		return x;
+  	}
+  
+  	public void setX(T x) {
+  		this.x = x;
+  	}
+  
+  	public T getY() {
+  		return y;
+  	}
+  
+  	public void setY(T y) {
+  		this.y = y;
+  	}
+  
+  	@Override
+  	public String toString() {
+  		return "Point [x=" + x + ", y=" + y + "]";
+  	}
+  }
+  
+  package com.test1214;
+  
+  public class Test {
+  
+  	public static void main(String[] args) {
+  		Point<Integer> p1 = new Point<>();
+  		p1.setX(120);
+  		p1.setY(76);
+  		System.out.println(p1);
+  		
+  		Point<Double> p2 = new Point<>();
+  		p2.setX(36.75);
+  		p2.setY(75.39);
+  		System.out.println(p2);
+  	}
+  }
+  
+  ```
+
+  
+
+### java.lang.String类
+
+- String是Java中**不可变**的字符序列。
+
+- **当修改String的内容时会产生新的String对象。当需要大量修改字符串时，不建议使用String类型。**
+
+- **String重写了Object类中的equals()方法，用于判断两个字符串的内容是否相等。**
+
+  ```java
+  String s1 = "abc";
+  String s2 = "abc";
+  String s3 = new String("abc");
+  
+  System.out.println(s1 == s2); // true
+  System.out.println(s1 == s3); // false
+  System.out.println(s1.equals(s2)); // true
+  System.out.println(s1.equals(s3)); // true
+  ```
+
+  **![image-20231214144404337](D:\华信教育\2023下\Java\images\9-10\image-20231214144404337.png)**
+
+- **String s = new String("abc");该行代码创建了几个String对象？(*)**
+  
+  - 创建了两个String对象。
+
+
+
+
+
+### java.lang.StringBuffer与java.lang.StringBuilder类
+
+- StringBuffer与StringBuilder是Java中**可变的**字符序列。
+
+- **每次对StringBuffer与StringBuilder的修改不会产生新的字符串对象。所以如果需要大量修改字符串时，建议使用StringBuffer或StringBuilder。**
+
+- **StringBuffer与StringBuilder的区别？(*)**
+
+  - **StringBuffer是线程安全的。**
+  - **StringBuilder是线程不安全的。在不考虑线程安全的情况下，建议使用，效率比StringBuffer高。**
+
+-  java.lang.**StringIndexOutOfBoundsException**：运行时异常，字符串下标越界异常。
+
+- **StringBuffer与StringBuilder没有重写Object类中的equals()方法，不能使用equals()方法判断内容是否相等**。
+
+- **StringBuffer与StringBuilder的方法会改变自身的内容**。
+
+  ```java
+  StringBuilder s1 = new StringBuilder("abc");
+  System.out.println(s1);
+  
+  // 在字符串的末尾追加内容
+  s1.append("def1234567890");
+  System.out.println(s1);
+  
+  // 从下标为2的位置开始删除字符串，删除到下标为6的位置之前(半包含)
+  s1.delete(2, 6);
+  System.out.println(s1);
+  
+  // 删除指定位置的字符
+  s1.deleteCharAt(5);
+  System.out.println(s1);
+  
+  // 在指定的位置之前，插入内容
+  s1.insert(0, "Java");
+  System.out.println(s1);
+  
+  // 释放字符串对空闲的内存
+  s1.trimToSize(); 
+  
+  StringBuilder s2 = new StringBuilder("abc");
+  StringBuilder s3 = new StringBuilder("abc");
+  System.out.println(s2 == s3); // false
+  System.out.println(s2.equals(s3)); // false
+  System.out.println(s2.toString().equals(s3.toString())); // true
+  ```
+
+
+
+### 常用集合
+
+- 常用集合的结构
+
+  ![image-20231218092852322](D:\华信教育\2023下\Java\images\9-10\image-20231218092852322.png)
+
+- **Set、List、Map的区别？(*)**
+  - **Set：不能保存重复值，不能保存元素加入的顺序。**
+  - **List：可以保存重复值，可以保存元素加入的顺序。**
+  - **Map：每次保存一对键值(Key-Value)对，键不能重复，值可以重复。**
+
+
+
+### java.util.Set接口
+
+- **java.util.TreeSet类：创建时不能指定集合的长度(默认长度为0)，集合中的元素以升序排序**。
+
+- **java.util.HashSet类：创建时可以指定集合的长度(默认长度为16)。集合中的元素根据元素的hashCode进行排序。**
+
+  ```java
+  // 创建长度为0的Set集合
+  // TreeSet<String> set = new TreeSet<>();
+  // 默认创建长度为16的集合
+  // HashSet<String> set = new HashSet<>();
+  // 创建指定长度的集合
+  HashSet<String> set = new HashSet<>(100);
+  
+  set.add("123");
+  set.add("456");
+  set.add("CC");
+  set.add("BB");
+  set.add("FF");		
+  set.add("AA");
+  set.add("DD");
+  set.add("EE");
+  
+  
+  System.out.println(set);
+  // 清空集合
+  // set.clear();
+  // System.out.println(set);
+  
+  // 移除集合中指定的元素，成功返回true,否则返回false
+  System.out.println(set.remove("AA"));
+  System.out.println(set);
+  // 返回集合中元素的个数
+  System.out.println(set.size());
+  // 判断集合中是否存在指定的元素
+System.out.println(set.contains("EE"));
+  // 判断集合是否为空
+  System.out.println(set.isEmpty());
+  
+  // 遍历Set集合的方法一：迭代器
+  // 将Set集合中的数据复制到迭代器中
+  System.out.println("-----------方法一-----------");
+  Iterator<String> it = set.iterator();
+  // 遍历迭代器，获得所有数据
+  // hasNext()：判断迭代器当前指针的下一个位置是否存在数据
+  while(it.hasNext()) {
+      // next()：将指针向下移动一个位置，并返回指针指向的数据
+      System.out.println(it.next());
+  }
+  
+  // 遍历Set集合的方法二：forEach循环
+  System.out.println("-----------方法二-----------");
+  for (String s : set) {
+      System.out.println(s);
+  }
+  
+  // 遍历Set集合的方法三：stream()
+  System.out.println("-----------方法三-----------");
+  set.stream().forEach(t -> System.out.println(t));
+  
+  // 遍历Set集合的方法四：Lambda表达式
+  System.out.println("-----------方法四-----------");
+  set.forEach(t -> System.out.println(t));
+  
+  // 简化Lambda表达式
+  System.out.println("-----------简化-----------");
+  set.forEach(System.out::println);
+  ```
+  
+  
+
+### java.util.List接口
+
+- **ArrayList、LinkedList、Vector的区别？(*)**
+
+  - **ArrayList类：底层使用数组实现。查询数据时效率高，插入与删除数据时效率低。**
+  - **LinkedList类：底层使用链表实现。查询数据时效率低，插入与删除数据时效率高。**
+  - Vector类：功能与ArrayList相似。Vector安全的，ArrayList是线程不安全的。
+
+- 示例：
+
+  ```java
+  // 创建长度为0的集合
+  // LinkedList<String> list = new LinkedList<>();
+  // 创建默认为长为10的集合
+  // ArrayList<String> list = new ArrayList<>();
+  // 创建指定长度的集合
+  ArrayList<String> list = new ArrayList<>(100);
+  
+  list.add("CC");
+  list.add("FF");
+  list.add("AA");
+  list.add("DD");
+  list.add("BB");
+  list.add("AA");
+  list.add("EE");
+  
+  System.out.println(list);
+  // 判断集合中是否存在指定的元素
+  System.out.println(list.contains("BB"));
+  // 返回集合中元素的个数
+  System.out.println(list.size());
+  // 判断集合是否为空
+  System.out.println(list.isEmpty());
+  // 获得集合中指定位置的数据，如果下标越界，则运行时抛出异常
+  System.out.println(list.get(2));
+  // 在集合中查找指定元素首次出现的位置，没找到返回-1
+  System.out.println(list.indexOf("AA"));
+  // 在集合中查找指定元素最后出现的位置，没找到返回-1
+  System.out.println(list.lastIndexOf("AA"));
+  // 判断指定的元素是否出现了一次
+  System.out.println((list.indexOf("BB") == list.lastIndexOf("BB") ? "只出现了一次" : "出现了多次"));
+  // 移除集合中指定位置的元素，移除成功返回被移除的元素，如果下标越界，则运行时抛出异常
+  System.out.println(list.remove(3));
+  System.out.println(list);
+  // 移除集合中首次出现的元素，成功返回true,否则返回false
+  System.out.println(list.remove("AA"));
+  System.out.println(list);
+  // 释放集合中空闲的内存
+  list.trimToSize();
+  
+  // 遍历List集合方法一：for循环
+  System.out.println("----------方法一---------");
+  for(int i = 0 ; i < list.size() ; i++) {
+      System.out.println(list.get(i));
+  }
+  
+  // 遍历List集合方法二：forEach循环
+  System.out.println("----------方法二---------");
+  for (String s : list) {
+      System.out.println(s);
+  }
+  
+  // 遍历List集合方法三：stream()
+  System.out.println("----------方法三---------");
+  // list.stream().forEach(t -> System.out.println(t));
+  list.stream().forEach(System.out::println);
+  
+  // 遍历List集合方法四：stream
+  System.out.println("----------方法四---------");
+  // list.forEach(t -> System.out.println(t));
+  list.forEach(System.out::println);
+  
+  ArrayList<Integer> list1 = new ArrayList<>();
+  
+  list1.add(100);
+  list1.add(200);
+  list1.add(300);
+  list1.add(400);
+  list1.add(500);
+  list1.add(600);
+  
+  // 过滤集合：当集合中大于等于400的数据取出来
+  //		List<Integer> list2 = list1.stream().filter(new Predicate<Integer>() {
+  //			@Override
+  //			public boolean test(Integer t) {
+  //				if(t >= 400)
+  //					return true;
+  //				return false;
+  //			}
+  //		}).toList();
+  //		System.out.println(list2);
+  List<Integer> list2 = list1.stream().filter(t -> t >= 400).toList();
+  System.out.println(list2);
+  ```
+
+  
+
+### java.util.Map接口
+
+- **java.util.Hashtable类：线程安全的。不允许使用null作为键或值。**
+
+- **java.util.HashMap类：线程不安全的。允许使用null作为键或值。**
+
+- **JDK1.7的HashMap与JDK1.8的HashMap的区别？(*)**
+
+  - JDK1.7的HashMap
+    - JDK1.7中的HashMap使用了**数组+链表（散列表）**的数据结构。
+    - JDK1.7的链表在扩容时使用的是**头插**法。
+  - JDK1.8的HashMap
+    - JDK1.8的HashMap使用了**数组+链表+红黑树**的数据结构。
+    - JDK1.8的链表在扩容时使用的是**尾插**法。
+    - **当HashMap中的数据个数超过64个时，并且某个链表的长度超过8时。这个链表会转化为红黑树(树化)**。
+
+  ```java
+  // 创建默认长度为16的集合，如果集合的长度不足，默认根据集合长度的0.75自动扩展集合
+  // HashMap<Integer,String> map = new HashMap<>();
+  // 创建指定长度的集合，如果集合的长度不足，默认根据集合长度的0.75自动扩展集合
+  HashMap<Integer,String> map = new HashMap<>(100);
+  
+  map.put(100, "AA");
+  map.put(200, "BB");
+  map.put(300, "CC");
+  map.put(400, "DD");
+  map.put(500, "EE");
+  map.put(600, "FF");
+  
+  System.out.println(map);
+  // 判断集合中是否存在指定的键
+  System.out.println(map.containsKey(300));
+  // 判断集合中是否存在指定的值
+  System.out.println(map.containsValue("QQ"));
+  // 获得集合中指定键对应的值，如果键不存在，返回null
+  System.out.println(map.get(200));
+  // 返回集合中键值对的个数
+  System.out.println(map.size());
+  // 移除集合中指定键对应的键值对，移除成功返回键对应的值，如果移除失败，返回null
+  System.out.println(map.remove(3000));
+  System.out.println(map);
+  
+  // 遍历Map集合方法一：Set + 迭代器
+  System.out.println("-------------方法一--------------");
+  // 将Map中所有的键复制到Set集合中
+  Set<Integer> keySet = map.keySet();
+  // 将Set中所有的键复制到迭代器中
+  Iterator<Integer> it = keySet.iterator();
+  // 遍历迭代器中所有的键，通过键获得Map中所有的值
+  while (it.hasNext()) {
+      // 获得迭代器中的键
+      Integer key = it.next();
+      // 根据键获得Map集合中对应的值
+      String value = map.get(key);
+      System.out.println(key + " : " + value);
+  }
+  
+  // 遍历Map集合方法二：Entry + forEach循环
+  System.out.println("-------------方法二--------------");
+  // 将Map集合中的每个键值对，保存到Set集合中
+  Set<Entry<Integer, String>> entrySet = map.entrySet();
+  for (Entry<Integer, String> entry : entrySet) {
+      System.out.println(entry.getKey() + " : " + entry.getValue());
+  }
+  
+  // 遍历Map集合方法三：Lambda表达式
+  System.out.println("-------------方法三--------------");
+  map.forEach((k, v) -> System.out.println(k + " : " + v));
+  ```

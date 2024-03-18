@@ -1,0 +1,2594 @@
+第二节 数据库设计
+1.软件开发过程：
+    需求分析-设计-编码-测试-安装部署
+2.数据库设计：
+    需求分析（事物和属性）
+    概念设计（实体-属性-联系）
+    逻辑设计（表-列-_________）
+
+3. 概念设计：
+     实体和属性：一个个体能唯一确定一个属性值。
+
+4. 逻辑设计：
+      一个实体转换成一个表，实体的属性转换成表的列。
+      联系类型：
+         1：n:把“1”端表的主键放到“n”端中充当外键。
+         1:1：可以把任意端的主键放到另一端充当外键。
+         n:m:生成一个新表，两端表的主键的组合在新表中
+		充当主键，又是两个外键。
+
+
+主键：一个表必须有且只有一个主键。数据不空不重。
+外键：起连接作用的属性。属性是其他表的主键。
+       也可以是本表的主键。数据：可重可空，数据必须存在。
+   
+练习：
+校长（A,B,C）主键：A
+学校（D,E,F,A，H）主键：D,外键：A
+学生（SH,SN,D）主键SH,外键：D
+课程（ch,cn）主键：ch
+选课表（SH,CH,CR）
+	主键：（sh，ch）
+	外键：sh 和 ch
+------------------------------
+范式分析：对表的操作--（分解）1范式  2范式  3范式
+   需求分析---概念设计--逻辑设计（范式分析）---物理设计--维护实施。
+   
+1范式：属性和属性值不可分
+1范式的问题：
+   插入异常：主键（学号，课程号）
+       只插入学生信息，课程号为空，违背了主键约束。
+   删除异常：删除学生信息，会删除不该删除的课程信息。造成数据丢失。
+   修改异常：修改学生的选课号，造成数据不一致。
+
+为什么产生问题？
+    非主属性                   主键（学号，课程号）
+    姓名，专业，出生日期，专业  ---- 由学号决定，不由课程号决定。 部分依赖主键。
+    课程名，学分---------------------由课程号决定，不由学号决定。部分依赖主键。
+    成绩-----------------------------与学号有关，与课程号有关。完全依赖主键。
+  因为存在 部分 依赖。
+
+解决问题：消除部分依赖。--分解表。---- 2范式。
+    学生（学号，姓名，专业，出生日期，专业） 主键：学号   -- 2范式
+     课程（课程号，课程名，学分）         主键：课程号
+      选课（学号，课程号，成绩）   主键（学号，课程号） 外键：学号，课程号
+
+2范式：1范式，非主属性完全依赖主键，不存在部分函数依赖。
+
+2范式的问题： 存在  传递 依赖   
+    学号  决定   系名   ，系名决定系地址，系电话
+    学号 传递 决定 系地址，系电话  
+  系名其传递作用。
+
+解决： 消除传递依赖。--- 分解表。-- 3范式。（不存在传递依赖，也不存在部分依赖）
+    系（系名，系地址，系电话）
+    学生（学号，姓名，系名） 外键：系名
+
+------------------------------------------
+SQL--DDL
+登录命令：mysql -uroot -p123456 
+一、查看数据命令：
+   show databases;
+  默认有4个系统数据库，不能使用。
+二、创建数据库：
+  create database db_数据库名；
+  判断数据库不存在时创建：
+  create database if not exists db_数据库名；
+
+三、删除数据库：
+   drop database db_数据库；
+   判断删除的数据库存在。
+   drop database if exists  db_数据库;
+
+四、使用数据库：
+   use 数据库名；
+
+五、查看当前使用数据库：
+  select database();
+
+-----练习---
+1. 创建 db_bookms
+2.查看所有数据库
+3. 删除db_bookms;
+4. 再创建db_bookms
+5. 使用db_bookms
+6. 查看正在使用的数据库。
+
+-------------
+表的创建：
+create table tb_表名（
+ 列名  数据类型，
+ .....
+ 列名  数据类型
+ ）;
+
+一、数据类型
+  3种：数值型、字符型、日期型。
+1.数值型：
+   1.1 整数：
+         tinyint  smallint    int  bigint
+-------------------------------------
+            1         2         4       8
+           -128~127
+ unsigned    0~255
+
+int unsigned:无符号整数。
+
+例：创建表tb_int
+ create table tb_int(
+  int1 tinyint,
+  int2  tinyint unsigned,
+  int3 int,
+  int4 int unsigned
+);
+
+创建一个sql脚本文件。
+  在d:\mysqldm\text1.sql
+source d:\mysqldm\text1.sql 回车。
+
+2.查看数据库中的所有表：
+  show tables;
+3.查看表的结构：
+   desc 表名；
+
+
+1.2 小数
+    浮点型：float,double.有精度损失。
+    定点型：decimal(m,d):d表示小数位数。0~30位。
+                         m表示整数+小数。0~65位。
+            numeric(m,d)和decimal用法一样。
+例：
+create table my_fd(
+ f1 float,
+ f2 double
+);
+-- 插入的数据有损失：float：总共6位。double：共17位。
+insert into my_fd values(123.34567,123456789.12345768789);
+
+例：成绩：百分制，保留2位小数。100.00：decimal(5,2) -999.00`999.99
+
+create table my_dec(
+id int,
+score decimal(5,2)
+);
+insert into my_dec values(1,98.34);
+insert into my_dec values(2,98.567896); -- 小数位数超出范围，不出错。四舍五入。
+insert into my_dec values(3,1800.33335); -- 错误：out of  range value
+
+--------------------
+二、字符型：
+     char(n):固定分配n个字符长度。
+             浪费空间，节省时间。
+             数据长度不变。性别，状态
+             0~255
+  varchar(n):根据实际输入的数据长度分配字符数。
+             节省空间，浪费时间。
+              数据长度变化。
+             0~65535
+        text:大文本数据。
+        blob：二进制数据。图片，视频...
+             文件服务器管理大文件数据。
+
+
+例：  id    name
+-----------------------
+      int   char(20)      -- 固定分配20个字符的长度
+       1     李明         -- 分配20个字符。   2个字符= 6 个字节：编码方式
+
+       id    name
+-----------------------
+      int   varchar(20)   --最多分配20个字符的长度
+       1     李明	  --  分配2个字符的长度。
+       2     张明媚       --  分配3个字符的长度。
+       
+
+create table my_ch(
+id int,
+name varchar(20),
+sex char(1)
+);
+insert into my_ch values(1,'李明','男');
+
+insert into my_ch values(1,'李明','男1'); -- 错误
+--Error Code: 1406. Data too long for column 'sex' at row 1	0.000 sec
+
+------------------------
+三、日期类型
+    1.year
+    2.date
+    3.time
+    4.datetime
+
+1. year：范围：1901~2155
+         数据：2023  ‘2023’。
+              ‘00’~‘69’     2000~2069
+              ‘70’~‘99’     1970~1999
+
+create table my_year(
+ id int,
+ creat_year year
+);
+insert into my_year values(1,2023);
+insert into my_year values(1,8888); -- out of range
+
+2. date:范围：1000-01-01~9999-12-31
+        字符串格式：  '2000-12-20' '2000/3/2'
+        数值型格式： 20001202   -- 不推荐
+create table my_date(
+ id int,
+ creat_year year,
+ birth  date
+);
+insert into my_date values(1,2000,'2000-12-3');
+
+3. time :范围： -838:59:59~838:59:59
+         字符串格式：‘hh:mm:ss’ ‘12:45:23’
+         数值型格式： 124523  --- 不推荐
+
+create table my_time(
+ id int,
+ creat_year year,
+ birth  date，
+ time1 time
+);
+insert into my_time values(1,2022,'1999-2-2','12:23:43');
+
+4. datetime:范围 1970-01-01 0:0:0 ~ 9999-12-31 23:59:59
+            字符串格式： YYYY-MM-DD HH:MM:SS  '2000-12-20 12:45:23'
+            函数now()：当前时间。
+
+create table my_time(
+ id int,
+ creat_year year,
+ birth  date，
+ time1 time，
+ sys_dt datetime
+);
+insert into my_time values(1,2023,'2022-2-2','12:32:22','2023-10-17 11:50:23');
+insert into my_dt values(1,2023,'2022-2-2','12:32:22',now());
+
+insert into my_dt values(1,now(),now(),now(),now());
+-------------
+复习：数据类型：数值；字符；日期；date，datetime
+ timestamp:时间戳。
+ datetime：
+
+----  数据约束：对列进行约束----------
+1. 实体完整性约束：
+2. 用户自定义约束：
+3. 参照完整性约束：
+
+ 
+create table tb_表名（
+ 列名  数据类型   数据约束，
+ .....
+ 列名  数据类型   [数据约束]
+ ）;
+
+
+一、实体完整性约束：主键 primary key。
+   主键：唯一标识一行记录,一个属性或多个属性组合。
+   表必须有且只能有一个主键。
+   主键：属性选择：尽量不用有意义是属性。没意义的属性id。
+   数据约束：不重复，不空。
+
+例：
+ create table my_pk(
+   id int primary key,
+   name varchar(20)
+)；
+insert into my_pk values(1,'李明');
+insert into my_pk values(1,'李明');
+Error Code: 1062. 主键不能重
+Duplicate entry '1' for key 'my_pk.PRIMARY'	0.000 sec
+
+insert into my_pk values(null,'李明');
+Error Code: 1048. 
+Column 'id' cannot be null	0.000 sec
+
+-- 主键如何自动处理：auto_increment
+    1. 主键用，数据类型必须是整数。
+    2. 从_1_开始，每次增加_1__.
+    3. 自动增长从最大值开始增1.
+    4. 删除记录，自增不受影响，不会减少或填补空缺。
+    5. 主键值：0，null，default都使用自动增长。
+
+例：
+create table my_AI(
+   id int primary key auto_increment,
+   name varchar(20)
+)；
+-- 使用自增
+insert into my_pk(name) values('李明');
+
+insert into my_pk(id,name) values(10,'李明');
+
+insert into my_pk(id,name) values(0,'李明');
+insert into my_pk(id,name) values(null,'李明');
+insert into my_pk(id,name) values(default,'李明');
+--------------
+二、用户自定义
+   1. not null :非空
+   2. default ‘默认值’
+   3. check ：检查 
+              字符型： check(列名 in（'值1','值2'）)
+                数值： check(列名>值 and 列名<值)
+   4. unique：唯一。数据不重复
+
+例：
+
+create table my_ud(
+   id int primary key auto_increment comment '编号',   
+   name varchar(20) not null comment '姓名',
+   sdept varchar(10) default '软件工程'comment '系',
+   sex  char(1) check(sex in('男','女')) comment '性别',
+   score int check(score>=0 and score<=100) comment '成绩',
+   car_id char(18) unique comment '身份证'
+)；
+
+-- 插入满足所有约束的记录
+insert into my_ud values(0,'赵四',default,'男',89,'1234');
+
+
+------------------
+ 创建表：列：数据类型  数据约束；
+
+外键约束：约束什么
+   外键：连接表的。两个表的公共属性。
+         是其他表（本表）的主键。
+   约束：
+      [constraint 约束名表_列_fk]
+      foreign key(外键) references 主表(主键)   -- 约束从表child add或update，主键值存在
+      [on delete restrict | cascade | set null]   -- 约束主表的删除操作。默认拒绝删除使用的记录。
+      [on update restrict | cascade | set null]   -- 约束主表的修改操作。默认拒绝修改使用的记录。
+
+      restrict：
+      cascade：当删除或修改主表的主键值记录时，如果外键值存在，
+               那么外键值的记录也被删除或修改。
+      set null：当删除或修改主表的主键值记录时，如果外键值存在，
+               那么外键值的记录也被设置为NULL。
+
+
+先创建主表，再创建系表。
+     
+ 
+
+
+
+     sdept  --主表 father                              
+  id   name
+-----------------
+  1    软件工程
+  2    交通系
+  3    机械系
+  4    外语
+
+ student   -- 从表 child
+  id   name  sex  s_id                 s_id 外键
+------------------------
+  1    张三   男    1
+  2    李四   男    1 
+     
+
+                 add        update    delete
+-----------------------------------------------------
+student(child)   约束         约束       不用      主键值是否存在
+-------------------------------------------------------
+sdept (father)    不用        约束        约束     （外键值是否使用）
+-----------------------------------------------------------------
+
+例：创建系和学生表：
+create table sdept(
+
+id int primary key auto_increment,
+
+name varchar(20)
+);
+
+
+# Table, Create Table
+student, CREATE TABLE `student` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `sex` char(1) DEFAULT NULL,
+  `s_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `s_id` (`s_id`),
+  CONSTRAINT `student_ibfk_1` 
+ FOREIGN KEY (`s_id`) REFERENCES `sdept` (`id`) 
+ ON DELETE RESTRICT 
+ ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
+
+
+
+ERROR 1452: 1452: 
+Cannot add or update a child row: a foreign key constraint fails
+ (`db_test2409`.`student`, CONSTRAINT `student_ibfk_1` 
+FOREIGN KEY (`s_id`) REFERENCES `sdept` (`id`) 
+ON DELETE RESTRICT 
+ON UPDATE RESTRICT)
+SQL Statement:
+INSERT INTO `db_test2409`.`student` (`name`, `sex`, `s_id`) 
+VALUES ('李四', '男', '20')
+
+
+ERROR 1451: 1451: Cannot delete or update a parent row: 
+a foreign key constraint fails (`db_test2409`.`student`, 
+CONSTRAINT `student_ibfk_1` FOREIGN KEY (`s_id`) REFERENCES `sdept` (`id`)
+ ON DELETE RESTRICT 
+ON UPDATE RESTRICT)
+SQL Statement:
+DELETE FROM `db_test2409`.`sdept` WHERE (`id` = '1')
+
+
+select * from sdept;
++----+--------------+
+| id | name         |
++----+--------------+
+|  1 | 软件工程     |   -- 删除id=1的记录，删不掉。因为1被外键使用。
+|  2 | 交通         |
+|  3 | 外语         |   -- 删除id=3的记录，能删掉，没被外键使用。
++----+--------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from student;
++----+--------+------+------+
+| id | name   | sex  | s_id |
++----+--------+------+------+
+|  1 | 张三   | 男   |    1 |  -- 1 再使用。
+|  3 | 李四   | 男   |    2 |
+|  4 | 赵四   | 男   |    1 |
++----+--------+------+------+
+
+    
+
+-- 1.测试cascade：
+ 创建表：
+
+---------------------------------------------
+修改表：alter table 表名 
+
+   create database db_test_9_27;
+   use db_test_9_27;
+   create table student(
+    id int not null,
+    name char(20)
+   );
+
+   1.修改表名：
+    alter table 旧表名 
+    rename to 新表名；
+
+    rename table 旧表名 to 新表名；
+   例：把student改成tb_stu.
+    alter table student 
+   rename to tb_stu;
+
+   2.添加列：
+    alter table 表名
+    add [column] 列名 数据类型 [约束] [first|after 列名]；
+
+   例：添加sex  char(1);
+    alter table tb_stu
+    add sex char(1);
+   例：添加birth date 放在name后
+     alter table tb_stu add birth date after name;
+   例：添加score int 成绩大于0.
+    alter table tb_stu add score int check(score>0);
+
+  3.修改列名：
+    alter table 表名
+    change 旧列名 新类名 数据类型 [数据约束]；
+   
+   例：修改birth改成birthday date.
+    alter table tb_stu 
+    change birth birthday date;
+
+  4.修改列的数据类型：
+    alter table 表名
+    modify 列名 新数据类型 [数据约束]；
+   
+   例：修改name数据类型改成varchar(30);
+    alter table tb_stu modify name varchar(30);
+
+  5.删除列：
+    alter table 表名 drop 列名；
+    删除score列：
+    alter table tb_stu drop score;
+
+-----------------------
+  约束：
+	1.primary key
+	2.not null     -- 不能独立添加
+	3.default      -- 不能独立添加
+	4.check
+	5.unique
+	6.foreign key() references 主表（主键） 
+
+
+   1. 为name设置非空：-- 通过修改数据类型或列名
+    alter table tb_stu modify name char(30) not null;
+
+   2.添加主键约束：(列非空)
+    alter table 表名 add  primary key(列名);
+   例：为学生的id设置主键。
+    alter table tb_stu add primary key(id);
+
+   3.添加check约束：
+   alter table 表名
+   add [constraint 约束名表_列_ck]
+   check();
+    例： 为sex 添加 男，女范围约束
+   alter table tb_stu 
+   add constraint stu_sex_ck
+   check(sex in('男','女'))
+
+  4.添加unique约束：
+   alter table 表名 add unique(列名);
+   
+   例：为name添加unique约束
+   alter table tb_stu add unqiue(name);
+ 
+ -----------------------------------------
+  5. 外键约束：
+    alter table 表名
+    add  [constraint 约束名表_列名_fk]
+    foreign key(外键) references 表(主键）；
+
+  例：创建表sdept(id,name)
+    create sdept(
+    id int primary key auto_increment,
+    name varchar(30)
+   );
+
+  例：为tb_stu添加类s_id;
+    把sdept的主键放到tb_stu做外键。
+   1. 为tb_stu添加一个外键列。
+     alter table tb_stu add t_id int;
+
+   2.
+      alter table tb_stu
+
+      add [constraint tb_stu_tid_fk]
+      foreign key(t_id) references sdept(id);
+
+-----------------
+  删除约束：
+    1. 删除外键约束：
+     alter table 表名 drop constraint|foreign key 约束名；
+   
+    2.删除unique约束：
+     alter table 表名
+     drop index 列名；
+
+    3.删除主键约束：
+     alter table 表名
+     drop primary key；
+
+---------------------------
+  删除表：
+    drop table 表名；
+   主从表：先删除从表，再删除主表。
+--------------------------------------------
+第一部分DDL:create,alter,drop.
+  database,table,column,constraint
+
+第二部分DML:insert，update，delete,select
+
+create database db_test9_31;
+use db_test9_31;
+create table tb_goods(
+ id int primary key auto_increment,
+ name varchar(20) not null,
+ price decimal(10,2),
+ type int
+);
+
+一、插入数据：
+  
+-- 1.给出表的全部列名
+   insert into 表名[（列1，列2..）] -- 省略列名，相当于列名全写。
+   values|value(值1，值2,...)；
+   值的个数，数据类型及约束，顺序和列一致。
+
+ -- 向tb_goods表中插入一行数据。
+   insert into tb_goods(id,name,price,type)
+   values(0,'电风扇',299,1)
+
+Error Code: 1062. 主键重复
+Duplicate entry '2' for key 'tb_goods.PRIMARY'	0.000 sec
+
+ -- 2.一次插入多行：
+     insert into 表名（列1，列2..）
+     values|value(值1，值2,...),
+		 (值1，值2,...),
+                   ...
+	    	 (值1，值2,...);
+
+ -- 3.给出部分列名：非空的列必须给出，不能省略。
+ 
+    
+  -- 向tb_good中插入空调信息。
+    
+   null代表什么数据类型？可以是任何数据类型的默认值。
+   price default 0
+
+ -- 4.批量插入数据：
+   1.创建一个表tb_goods_dq(id,name,price,type)
+    create table 表名 like 表模板；
+    
+    create table tb_goods_dq like tb_goods;
+  
+   2. 商品表name 为 电风扇的信息放入到 新表。
+    insert into tb_goods_dq
+    select * from tb_goods where name='电风扇';
+
+-------------------------------
+ 修改数据：
+ 1 update 表名
+ 3    set 列名=值1，列名=值2..
+ 2  where 条件；
+
+-- 1. 修改id=1的商品的价格改为899.
+     update tb_goods
+        set price=899
+      where id=1;
+
+-- 2.修改数据，所有商品的价格改成九折。
+    update tb_goods
+       set price=price*0.9;
+
+-- 3. 修改商品id=2的 name改成‘洗衣机’， 价格改成8999。
+    update  tb_goods
+       set name='洗衣机' , price=8999
+      where id=2;
+
+-----------------------------------
+三、删除数据：
+     delete from 表名 where 条件；
+
+ -- 1. 删除id=1的商品信息。
+     delete from tb_goods where id=1;
+
+ -- 2. 清空商品表：
+     delete * from tb_goods;  -- 错误，不能加*。
+     delete from tb_goods;
+---------------------------------------
+ 创建type_goods（id，name）商品分类表
+   create table type_goods(
+    id  int primary key auto_increment,
+    name varchar(20) not null
+    );
+
+-- 为tb_goods的type添外键约束。
+
+alter table tb_goods
+add foreign key(type) references type_goods(id);
+
+-- 1. 向两个表插入一行记录。
+-- type_goods （1，‘电器’）
+
+insert into type_goods values(1,'电器');
+
+--  tb_goods（1，‘电风扇’,300,1）
+
+insert into tb_goods
+values(0,'电风扇',300,1);
+
+-- 先向主表中插入数据，再向从表中插入数据
+
+-- 删除表：先删除从表，再删除主表。
+--------------------------------------
+ 查询：
+ 数据准备：
+1. db_job:(3文件)
+ source 文件路径  回车
+ source F:\mysqldm\mysqldm\1_create_table(commit)1.txt
+ source F:\mysqldm\mysqldm\2_insert_items2.txt
+ source F:\mysqldm\mysqldm\3_delete_items.txt
+2. db_shop,db_xuanke,db_bookms
+ source F:\mysqldm\mysqldm\db_bookms.sql 
+ source F:\mysqldm\mysqldm\db_xuanke.sql 
+ source F:\mysqldm\mysqldm\db_shop.sql 
+
+
+ 命令：
+  show databases; -- 查看所有数据库；
+  use  db_job; -- 使用数据库
+  show tables; -- 查看数据库中的表；
+
+  desc employees ;-- 查看职工表的结构
+  select * from employees;-- 查看职工表的数据
+
+  drop database db_job;
+-----------------------------------------
+ 一、单表查询
+     select distinct */列名/表达式 [as] 别名
+       from
+
+
+-- 查询职工表中的employee_id,last_name
+   select employee_id,last_name
+     from employees;
+
+-- 数据与表无关，可以不写from
+   select 100;
+   select  now();
+
+  *:不建议使用，查询效率低。
+
+表达式：算术运算符：+，-，*,/.
+   select 5/2; -- 结果：2.5000
+   select 5+'5';--结果:10   数字字符转换成数值
+   select 5+'a';-- 结果：5  非数字字符转换成0
+   select 5+null;
+
+   null :没有数值
+   -- 当算术运算符中出现null，算术运算的结果一定为null。
+   -- 2. 查询所有员工的last_name,salary,年薪。
+    select last_name,salary,salary*12
+      from employees;
+
+ 别名：列 as 别名; 双引号 和 单引号 都行
+ -- 
+     -- 2. 查询所有员工的last_name,salary,年薪。
+    select last_name,salary,salary*12  '年薪'  --  'year sal'
+      from employees;
+ distinct:
+    1. 在select语句的最前面，distinct 列：对列的值去重。多列，列组合值的重复值。
+    2. 一个seleclt只能用一次。
+
+-- 查询employees表中职位job_id的信息，显示job_id.
+   select distinct job_id，last_name 
+   from employees;
+
+-----------------------------------------
+过滤子句：where
+   3  select 
+   1    from
+   2  where 条件； 逻辑值：真  假。对行进行筛选。
+
+  1. 比较运算符：=,>,>=,<,<=,!=,<>
+  2. 范围：(not) between 值1 and 值2；
+  3. 集合： (not)in(值1，值2..)
+  4. 是否为空： is (not) null
+  5. 模糊查询：(not)like
+  6. 逻辑：and ,or ,not
+
+-- 3.查找employees表中工资6000~12000之间的职工的信息
+ -- 显示：last_name,salary
+   
+   select last_name,salary from employees
+  
+where salary  between 6000 and 12000;
+-- where salary in(6000,12000);  -- 错误
+
+where salary>=6000 and salary<=12000;
+
+ -- 4. 查询employees中入职日期为1994-6-7的员工信息，
+ -- 显示last_name,department_id,hire_date.
+    select last_name,department_id,hire_date
+from employees
+
+    where hire_date='1994-6-7'
+
+ -- 5.查询employees中入职日期为97年及之后的员工信息。
+ -- 显示last_name,department_id,hire_date.
+    select last_name,department_id,hire_date
+
+    from employees
+
+    where hire_date>='1997-1-1';
+
+ in（值列表）：
+ -- 6.查询职工表中职位job_id 为IT_PROG或ST_CLERK员工信息
+ -- 显示last_name,job_id,salary.
+     select last_name,job_id,salary
+ from employees
+ 
+     -- where job_id in('IT_PROG','ST_CLERK');
+   -- 推荐使用in
+     where job_id ='IT_PROG' or job_id ='ST_CLERK'
+
+ is null/is not null
+ -- 查询职工表中部门号为null的员工信息，
+ -- 显示last_name,department_id.
+
+ like:模糊查询
+   %：任意长度的任意多个字符。0个多个
+   _: 一个长度的字符。1个
+   escape:声明字符，通知like模糊查询，指定字符后面的一个_或%不是转义字符。
+
+ -- 7.查询职工表中包含a字符的员工的last_name.
+   select last_name from employees 
+ 
+   where last_name like '%a%'; -- 'a%' '%a' '_a'
+
+ -- 8.查询职工表中包含a或e字符的员工的last_name.
+     select last_name
+ from employees
+ 
+    where last_name like'%a%'
+           or
+       
+          last_name like '%e%'
+
+-- 9.查询职工表中job_id包含A_的员工信息。
+ -- 显示last_name,job_id.
+     select last_name,job_id
+
+     from employees
+
+     where job_id like '%A/_%' escape '/';
+
+-- 10.查询工资不在6000~12000之间的员工信息，
+  -- 显示：last_name,salary.
+     select last_name,salary from employees
+  
+  -- where salary not between 6000 and 12000;
+   -- 推荐使用
+ -- where salary<6000 or salary>12000 
+ 
+  where not (salary>=6000 and salary<=12000)
+---------------------------------------------------
+  排序：order by 
+  3  select    列|表达式 as 别名
+  1   from
+  2  where                        -- 不能使用select后的别名
+  4  order by  列名 asc(默认，升序)|desc （降序）,列名
+             -- 能使用别名
+
+-- 1.查询职工表所有员工的last_name,hire_date.
+-- 查询结果hire_date升序排序。
+     select last_name,hire_date
+   
+    from employees
+   
+   order by hire_date desc;
+
+-- 2.查询职工表所有员工的last_name,salary.
+-- 查询结果salary 降序排序。
+  select last_name,salary from employees
+  
+order by salary desc;
+
+-- 3.查询职工表的姓名包含a的last_name,年薪。结果按照年薪降序排序。
+  select last_name,salary*12 yearsalary
+
+  from employees
+
+ where last_name like '%a%' and salary*12>10000
+  -- 不能用别名
+ order by yearsalary desc;  -- 能使用别名
+
+-- 4.查询职工的last_name,department_id,salary.
+-- 查询结果按照部门号升序排序，salary降序排序。
+  select last_name,department_id,salary
+    -> from employees
+    -> order by department_id ,salary desc;
+  -- 先对department_id进行排序，当department_id相同时，再根据salary进行排序。
+
+ order by子句进行多个列排序，列之间使用逗号分割。
+
+-- 5. 查询20与50号部门，并且在97年及以后入职的last_name,department_id,hire_date.
+-- 结果按照部门号降序排序，入职日期升序排序。
+
+  select last_name,department_id,hire_date
+
+from employees
+
+where department_id  in(20,50)
+      
+     and 
+      
+     hire_date>='1997-01-01'
+
+order by department_id desc,hire_date asc;
+
+-- 逻辑错误：永远为假。一个列只能有一个值。
+  department_id=20 and department_id=50    
+
+-- 正确
+   department_id=20 or department_id=50 
+-----------------------------------------------------
+ 聚合函数：（分组函数，组函数）
+   1. count(列名)：统计该列所有的不为null的元素的个数。
+                   从1开始，返回元素的个数。
+      count(*): * 代表一行。统计表的行数。
+
+   2. sum(列名)：列必须是数值类型。求和。
+   3. avg（列名）：列必须是数值类型，求平均值。
+   4. max（列名）：列的最大值。
+   5. min(列名)：  列的最小值
+
+
+ -- 1.统计职工表中有奖金的人数。
+    select count(commission_pct)
+     from employees;
+
+  -- 可以加列名吗？不行。
+   有聚合函数的select不要加列名。
+   聚合函数对表进行统计，返回一个值，列值多个。
+
+-- 2. 统计职工表中职位（job_id）的个数。
+     select  count(distinct job_id)  -- 去掉重复值再统计。
+     from employees;
+
+-- 3. 统计职工人数。
+     select count(*)
+     from  employees;
+
+-- 4. 统计50号部门的人数。
+    select count(*) 
+from employees
+where department_id =50;
+
+-- 5.统计职工表中的所有员工的工资总和，平均值，最大工资，最小工资，人数。
+    -- 几行几列。
+     select sum(salary) as 工资总和,
+	   
+            avg(salary) as 平均工资,
+       
+            max(salary) as 最高工资,
+       
+            min(salary) as 最低工资,
+       
+            count(*) as 总人数
+
+     from employees;
+------------------------------------------------
+  分组子句：group by
+  5  select
+  1  from
+  2  where                 ；   -- 多个条件用 and  or
+  3  group by  字段1，字段2； -- 字段值相同的行在一组
+  4  having                ；  -- 多个条件用 and  or
+  6  order by  字段1，字段2； -- 不同字段之间用逗号
+
+   
+-- 6.统计每个部门的人数。
+   -- 1. 对哪列进行分组； 部门号
+   -- 2. 使用了什么聚合函数。 count(*)
+  select department_id,count(*) as 人数  
+
+   from  employees
+   group by department_id;
+
+-- select后只能用group by 后的列名。
+
+ 
+ 
+     
+   
++---------------+-----------+
+| department_id | last_name |
++---------------+-----------+
+|          NULL | Grant     |  1   
+
+|            10 | Whalen    |  1
+
+|            20 | Hartstein |   3
+|            20 | Fay       |
+|            20 | ddd       |
+
+|            50 | Mourgos   |   5
+|            50 | Rajs      |
+|            50 | Davies    |
+|            50 | Matos     |
+|            50 | Vargas    |
+
+|            60 | Hunold    |    3
+|            60 | Ernst     |
+|            60 | Lorentz   |
+
+|            80 | Zlotkey   |  3
+|            80 | Abel      |
+|            80 | Taylor    |
+
+|            90 | King      |  3
+|            90 | Kochhar   |
+|            90 | De Haan   |
+
+|           110 | Higgins   |  2
+|           110 | Gietz     |
++---------------+-----------+
+
+ --2. 查询每个职位（job_id）的平均工资。
+ -- 显示： 职位号，平均工资。
+
+ 后台的分组情况：
++------------+----------+
+| A          |     NULL |  null  
+
+| AC_ACCOUNT |  8300.00 | 
+
+| AC_MGR     | 12000.00 |
+
+| AD_ASST    |  4400.00 |
+
+| AD_PRES    | 24000.00 |
+
+| AD_VP      | 17000.00 |
+| AD_VP      | 17000.00 |
+
+| IT_PROG    |  9000.00 |
+| IT_PROG    |  6000.00 |
+| IT_PROG    |  4200.00 |
+
+| MK_MAN     | 13000.00 |
+
+| MK_REP     |  6000.00 |
+
+| SA_MAN     | 10500.00 |
+
+| SA_REP     | 11000.00 |
+| SA_REP     |  8600.00 |
+| SA_REP     |  7000.00 |
+
+| ST_CLERK   |  3500.00 |
+| ST_CLERK   |  3100.00 |
+| ST_CLERK   |  2600.00 |
+| ST_CLERK   |  2500.00 |
+
+| ST_MAN     |  5800.00 |
++------------+----------+
+-- 代码
+    select job_id,avg(salary)
+   
+	from employees
+   
+	group by job_id
+
+-- 3. 每个部门的人数，平均工资，工资总和，最高工资，最低工资，
+ -- 结果按照人数升序排序，平均工资降序排序。
+select department_id,count(*) as '人数',
+	
+		  avg(salary) as '平均工资',
+
+		  sum(salary) as '总工资',
+
+                  max(salary) as '最大工资',
+                     
+		  min(salary) as '最小工资'
+   
+from employees 
+   
+group by department_id 
+   
+order by 人数,平均工资 desc;
+
+-- 4. 查询平均工资大于10000的部门号，平均工资，总人数。
+    select department_id，avg(salary) as 平均工资，count(*) as 人数
+      from employees
+      group by department_id
+      having  avg(salary)>10000   -- 过滤的目标是组。
+
+-- where 和 having 的区别：
+   1. 时间不一样：where先执行。不用分组也行。过滤是行。
+   2. having必须在group by后，过滤目标是组。
+   3.能写在where中的条件，尽量写在where中，不要放在having。
+     提高查询效率。
+
+
+-- 5.查询最低工资大于5000，并且job_id包含rep的职位信息，
+-- 显示：job_id,最低工资。
+
+-- 6.查询每个部门的每个职位的人数。
+ - - 分组情况：部门相同的组中，再按照职位分组，
++---------------+------------+
+| department_id | job_id     | 人数
++---------------+------------+
+|          NULL | SA_REP     | 1
+
+|            10 | AD_ASST    | 1
+
+|            20 | A          | 1
+ 
+|            20 | MK_MAN     | 1
+
+|            20 | MK_REP     | 1
+
+|            50 | ST_CLERK   | 4
+|            50 | ST_CLERK   |
+|            50 | ST_CLERK   |
+|            50 | ST_CLERK   |
+
+|            50 | ST_MAN     |  1
+
+|            60 | IT_PROG    |  3
+|            60 | IT_PROG    |
+|            60 | IT_PROG    |
+
+|            80 | SA_MAN     | 1
+
+|            80 | SA_REP     | 2
+|            80 | SA_REP     |
+
+|            90 | AD_PRES    | 1
+
+|            90 | AD_VP      |  2
+|            90 | AD_VP      |
+
+|           110 | AC_ACCOUNT | 1
+
+|           110 | AC_MGR     |  1
++---------------+------------+
+-- 代码
+   	select department_id,job_id, count(*) 人数 
+
+	from employees 
+
+	group by department_id, job_id 
+
+	order by department_id,job_id desc ;
+ --------------------------------------------------
+  限定子句：limit [起始位置],显示的行数；
+  
+   5  select
+   1    from
+   2  where
+   3   group by
+   4   having
+   6   order by
+   7   limit 
+ 
+   
+-- 1. 查询employees中工资最高的前5名员工的信息。
+-- 显示：last_name,salary.
+   -- 按工资降序排序。
+     select last_name,salary
+       from employees
+     order by salary desc
+     limit 5;  -- limit 0,5  默认起始位置从0开始。
+
+-- 2.查询employees中工资最高的第6-10名员工的信息。
+-- 显示：last_name,salary.
+      select last_name,salary
+       from employees
+     order by salary desc
+      limit 5,5 ;
+
+-- 第6个：起始位置：6-1=5，因为从0开始。
+
++-----------+----------+
+| last_name | salary   | 起始位置
++-----------+----------+
+| King      | 24000.00 |    0
+| Kochhar   | 17000.00 |    1
+| De Haan   | 17000.00 |    2
+| Hartstein | 13000.00 |    3
+| Higgins   | 12000.00 |    4
+
+| Abel      | 11000.00 |    5
+| Zlotkey   | 10500.00 |
+| Hunold    |  9000.00 |
+| Taylor    |  8600.00 |
+| Gietz     |  8300.00 |
+| Grant     |  7000.00 |
+
+|
+| ddd       |     NULL |
++-----------+----------+
+
+-- 3. 查询第4页，每页显示3条记录。
+      limit __9___, __3____;
+
+     第1页  limit 0,3 ；
+     第2页  limit 
+
+	1    0  limit  0,3   第1页
+	2    1 
+	3    2
+-------------- ----------------
+	4    3    limit 3,3  第2页
+	5
+	6
+------------------------------
+	7    6    limit 6,3   第3页
+	8
+	9
+--------------------------------
+        10   9    limit 9,3   
+	11
+	12
+---------------------------------
+
+                  limit startIndex，pageSize ； 
+      pageNO:表示页码；pageSize：表示每页显示的行数
+
+     startIndex=(pageNo-1)*pageSize ; （页码-1）  * 每页的条数
+----- 分页显示
+  void fenpage(pageNo,pageSize){
+   int startIndex=(pageNo-1)*pageSize ;
+   String sql="select    limit"+startIndex+","+pageSize;
+   
+}
+--7.查询第9页。每页10条记录
+    limit  80  , 10   ;
+
+--  8.显示人数最少的部门信息，显示：department_id,人数。
+	select department_id,count(*)as 人数
+
+	from employees
+
+	where department_id is not null
+
+	group by department_id
+
+	order by 人数 
+
+	limit 0,1;
+
+----------------------------------------------------
+   多表连接：
+    一、内连接：
+ 	1. 等值连接
+	2. 非等值连接
+	3. 自身连接
+
+    二、外连接：
+	1. 左外连接
+	2. 右外连接
+
+一、内连接：
+
+-- 1. 查询所有员工的last_name,department_name.
+   
+    select last_name,department_name
+      from employees, departments;
+ 
+  笛卡尔积：表1行数*表2行数
+  -- 147行= 21*7
+  -- employees：21行
+  -- departments:7行
+
+   2. 等值连接：-- 已知连接表的行数。能确定连接的行数吗？不确定
+       只有满足连接条件的记录才能显示。不满足的记录不显示。
+
+   职工表的外键department_id=部门表的主键department_id.
+    
+
+    select e.last_name,e.department_id,
+           d.department_name,d.department_id
+     from employees  as e, departments  as d
+     where  e.department_id=d.department_id
+
+ -- 别名：1. from  表 [as] 别名。 其他子句只能使用别名，不用使用表名。
+          2. 多表查询，列名最好加上表的前缀，提高查询效率。
+
+92标准：1992年的标准。
+
+     from  表1， 表2
+     where  多表连接条件 and 查询条件；  -- 连接条件和查询条件混合，语义不清
+
+99标准：1999年的标准：
+     from  表1  join  表2
+           on   多表连接条件
+     where  查询条件；   -- 表连接条件和查询条件分开，清晰。
+
+  select e.last_name,e.department_id,
+           d.department_name,d.department_id
+     from employees  as e join  departments  as d
+          on e.department_id=d.department_id
+
+-- 2. 查询last_name以 ing结尾的员工信息。
+-- 显示：last_name,salary,department_id,department_name.
+  	select e.last_name,e.salary,e.department_id,d.department_name
+
+	from employees e join departments d
+    
+		on e.department_id=d.department_id
+
+	where last_name like '%ing';
+
+-------------------------------
+  表连接，哪个表在先。
+   比如 职工表 （21 行）和部门表（7行）连接？
+
+ -- 1.查询员工的last_name,department_name,city.
+   -- employees(employee_id, department_id),
+  -- departments(department_id,location_id)
+  --  locations(location_id)
+
+
+  select e.last_name,d.department_name,l.city
+  from employees e 
+       join departments d
+       on e.department_id=d.department_id
+       join location l
+       on d.location_id=l.location_id
+
+
+
+
+                             departments
++-----------+---------------+------------------------------
+| last_name | department_id | department_id | location_id|location_id | city  
++-----------+---------------+------------------------------------------------
+| King      |            90 |      90 |        1700         1700 | Seattle     
+| Kochhar   |            90 |     90  |        1700
+| De Haan   |            90 |     90  |        1700
+| Hunold    |            60 |---
+| Ernst     |            60 |
+| Lorentz   |            60 |
+| Mourgos   |            50 |
+| Rajs      |            50 |
+| Davies    |            50 |
+| Matos     |            50 |
+| Vargas    |            50 |
+| Zlotkey   |            80 |
+| Abel      |            80 |
+| Taylor    |            80 |
+| Grant     |          NULL |
+| Whalen    |            10 |
+| Hartstein |            20 |
+| Fay       |            20 |
+| Higgins   |           110 |
+| Gietz     |           110 |
+| ddd       |            20 |
++-----------+---------------+
+
++---------------+-------------+
+| department_id | location_id |
++---------------+-------------+
+|            10 |        1700 |
+|            20 |        1800 |
+|            50 |        1500 |
+|            60 |        1400 |
+|            80 |        2500 |
+|            90 |        1700 |
+|           110 |        1700 |
++---------------+-------------+
+
++-------------+---------------------+
+| location_id | city                |
++-------------+---------------------+
+|        1400 | Southlake           |
+|        1500 | South San Francisco |
+|        1700 | Seattle             |
+|        1800 | Toronto             |
+|        2500 | Oxford              |
++-------------+---------------------+
+
+-- 2. 查询居中在'Toronto'的员工的信息。
+-- 显示：last_name,salary,job_id,job_title.
+  -- 哪几个表：employees, jobs, locations.
+  select e.last_name,j.job_id,j.job_title,l.city
+  from employees e
+ 
+       join departments d  on e.department_id=d.department_id
+       
+join locations l    on d.location_id=l.location_id
+	   
+join jobs j 	  on e.job_id=j.job_id
+ where l.city='Toronto'
+
+------------------------------------------------------
+   非等值连接：条连接条件不是一个等量关系。
+
+-- 1.查询职工的last_name,salary,grades_level.
+    select e.last_name,e.salary,j.grades_level
+    from employees e join job_grades j
+         on e.salary between j.lowest_sal and j.highest_sal;
+
++-----------+----------+
+| last_name | salary   | grade_level | lowest_sal | highest_sal 
++-----------+----------+----------------------------------------
+| King      | 24000.00 |E           |      15000 |       24999 |
+| Kochhar   | 17000.00 |E           |      15000 |       24999 |
+| De Haan   | 17000.00 |E           |      15000 |       24999 |
+| Hunold    |  9000.00 |C           |       6000 |        9999 |
+| Ernst     |  6000.00 |
+| Lorentz   |  4200.00 |
+| Mourgos   |  5800.00 |
+| Rajs      |  3500.00 |
+| Davies    |  3100.00 |
+| Matos     |  2600.00 |
+| Vargas    |  2500.00 |
+| Zlotkey   | 10500.00 |
+| Abel      | 11000.00 |
+| Taylor    |  8600.00 |
+| Grant     |  7000.00 |
+| Whalen    |  4400.00 |
+| Hartstein | 13000.00 |
+| Fay       |  6000.00 |
+| Higgins   | 12000.00 |
+| Gietz     |  8300.00 |
+| ddd       |     NULL |
++-----------+----------+
+
+
+
++-------------+------------+-------------+
+| grade_level | lowest_sal | highest_sal |
++-------------+------------+-------------+
+| A           |       1000 |        2999 |
+| B           |       3000 |        5999 |
+| C           |       6000 |        9999 |
+| D           |      10000 |       14999 |
+| E           |      15000 |       24999 |
+| F           |      25000 |       40000 |
++-------------+------------+-------------+
+--------------------------------------------------------------
+   自身连接：
+
+
+-- 3. 所有职工的经理信息，显示employee_id,last_name,manager_id,last_name.
+
+ A_emp
++-------------+-----------+------------+
+| employee_id | last_name | manager_id | employee_id | last_name
++-------------+-----------+------------+---------------------------
+|         100 | King      |       NULL |   -----         ----
+|         101 | Kochhar   |        100 |     100     | King
+|         102 | De Haan   |        100 |     100     | King
+|         103 | Hunold    |        102 |     102     | De Haan
+|         104 | Ernst     |        103 |
+|         107 | Lorentz   |        103 |
+|         124 | Mourgos   |        100 |
+|         141 | Rajs      |        124 |
+|         142 | Davies    |        124 |
+|         143 | Matos     |        124 |
+|         144 | Vargas    |        124 |
+|         149 | Zlotkey   |        100 |
+|         174 | Abel      |        149 |
+|         176 | Taylor    |        149 |
+|         178 | Grant     |        149 |
+|         200 | Whalen    |        101 |
+|         201 | Hartstein |        100 |
+|         202 | Fay       |        201 |
+|         205 | Higgins   |        101 |
+|         206 | Gietz     |        205 |
+|       11111 | ddd       |       NULL |
++-------------+-----------+------------+
+
+ B_manager
++-------------+-----------+------------+
+| employee_id | last_name | manager_id |
++-------------+-----------+------------+
+|         100 | King      |       NULL |
+|         101 | Kochhar   |        100 |
+|         102 | De Haan   |        100 |
+|         103 | Hunold    |        102 |
+|         104 | Ernst     |        103 |
+|         107 | Lorentz   |        103 |
+|         124 | Mourgos   |        100 |
+|         141 | Rajs      |        124 |
+|         142 | Davies    |        124 |
+|         143 | Matos     |        124 |
+|         144 | Vargas    |        124 |
+|         149 | Zlotkey   |        100 |
+|         174 | Abel      |        149 |
+|         176 | Taylor    |        149 |
+|         178 | Grant     |        149 |
+|         200 | Whalen    |        101 |
+|         201 | Hartstein |        100 |
+|         202 | Fay       |        201 |
+|         205 | Higgins   |        101 |
+|         206 | Gietz     |        205 |
+|       11111 | ddd       |       NULL |
++-------------+-----------+------------+
+---------------------------------------------------------------
+ 二、外连接：(left,right)
+      1.左外连接： from A  left [outer] join  B  on 连接条件;
+                  左表A的记录全都显示，在B表中没有匹配的行，
+                  用NULL填充。
+
+             外连接的记录 >= 内连接的记录
+      2.右外连接：from A  right join B on  连接条件;
+                  右表B的记录全都显示，在A表中没有匹配的行，
+                  用NULL填充。
+
+ -- 1.查询职工的last_name,department_name.
+   select e.last_name,d.department_name
+    from  employees e join departments d
+	  on  e.employee_id = d.employee_id
+-- 内连接：只有满足条件的记录才能显示，没有满足连接条件的记录不显示。
+  
+ -- 职工表中20行，连接后是否都显示？
+
++-----------+---------------+
+| last_name | department_id |department_id | department_name |
++-----------+---------------+------------------------------------
+| King      |            90 | 90 | Executive       |
+| Kochhar   |            90 | 90 | Executive       |
+| De Haan   |            90 | 90 | Executive       |
+| Hunold    |            60 |
+| 
+| Grant     |          NULL | -- 内连接：没有满足条件的记录，不显示
+  Grant     |          NULL |    NULL               NULL        -- 外连接：
+| Whalen    |            10 |
+| Hartstein |            20 |
+| Fay       |            20 |
+| Higgins   |           110 |
+| Gietz     |           110 |
++-----------+---------------+
+
++-----------+---------------+
+| last_name | department_id |department_id | department_name |
++-----------+---------------+------------------------------------
+| King      |            90 | 90 | Executive       |
+| Kochhar   |            90 | 90 | Executive       |
+| De Haan   |            90 | 90 | Executive       |
+ .........
+| null                  null  200 | ddd             |
+  null                  null  300 | 开发部          |
+| 
++-----------+---------------+
++---------------+-----------------+
+| department_id | department_name |
++---------------+-----------------+
+|            10 | Administration  |
+|            20 | Marketing       |
+|            50 | Shipping        |
+|            60 | IT              |
+|            80 | Sales           |
+|            90 | Executive       |
+|           110 | Accounting      |
+|           200 | ddd             |
+|           300 | 开发部          |
++---------------+-----------------+
++---------------+-----------------+
+| department_id | department_name |
++---------------+-----------------+
+|            10 | Administration  |
+|            20 | Marketing       |
+|            50 | Shipping        |
+|            60 | IT              |
+|            80 | Sales           |
+|            90 | Executive       |
+|           110 | Accounting      |
+|           200 | ddd             |
++---------------+-----------------+
+ -- 2.查询所有职工的last_name,department_name.
+    select e.last_name,d.department_name
+    from  employees e  left join departments d
+	  on  e.employee_id = d.employee_id
+ 
+
+-- 3. 查询所有部门的人员信息，last_name,department_name.
+    select e.last_name,d.department_name
+    from  employees e right join departments d
+	  on  e.employee_id = d.employee_id
+
+
+----------------------------------------------------------------
+ 嵌套查询：
+    select  ( select ..from )
+    from    (select ..from )
+    where   (select..from)   重点
+    group by 列名
+    having  （select）
+    order by 列名
+    limit  
+
+
+ where 后嵌套
+-- 1. 查询工资最低的员工姓名last_name.
+  select last_name ,salary
+from employees 
+
+order by salary asc 
+
+limit 0,1;
+
+ -- 错误：
+select last_name 
+
+from employees 
+
+where salary=min(salary)   
+
+-- 错误，因为聚合函数不能用在where后
+
+-- 分解：1.先求出最低工资。 2500
+    select min(salay) from employees;
+
+   2.求工资是2500的员工的姓名
+    select last_name 
+    from employees 
+    where salary = 2500
+-- 合成一个嵌套查询：
+      select last_name                            -- 外查询，后执行
+     from employees  
+     where salary = （
+			select min(salary) 
+	                from employees            -- 内查询，先执行
+                      ）；
+
+
+-- 查询工资大于176号员工的工资，显示：
+-- last_name,job_id,salary,查询的结果根据salary降序排序。
+  分解1: 查询176号的工资。 A
+         select salary from employees where employee_id=176;
+   
+     2. 查询比工资A大的职工的信息。
+      select last_name,job_id,salary
+      from employees
+      where salary >(A)
+      order by salary desc;
+
+-- 3. 查询职工表中入职最早的员工信息，显示：last_name,hire_date。
+   
+select last_name,hire_date
+ 
+from employees
+ where hire_date =(
+				
+				select min(hire_date)
+				
+				from employees
+                
+				);
+      
+
+  1.标量子查询：子查询返回的结果为单个数据，一个值。
+               where 后通常的运算符:=,<=....
+
+  -- shop数据库：商品名为'钢笔'的商品分类名称.
+  -- sh_goods ：商品表
+  -- sh_goods_category :商品分类表
+
+  -- 1.在sh_goods先查询钢笔的分类号。 A
+     select 
+
+  -- 2. 在sh_goods_category表中查下分类号A的分类名。
+
+
+ 1.子查询必须放在一对小括号内。
+ 2.如果子查询做为条件，子查询中查询的列的类型与主查询中条件列的类型保持一致。
+
+ 2. 列：返回一列，多行数据。where 运算符 in ,not in.
+
+ -- 查询分类名为"文具"，“音箱”下的商品的name,price,category_id.
+    1. 在分类表中先查询"文具"，“音箱”的分类号。 查询结果是多个数据。A
+ 
+    2. 在商品表查询分类号在A集合中的商品的name,price,category_id。
+ 
+ 3.行子查询：行子查询返回一行多列，where 后写法。
+
+
+-- 在商品表中查询价格最高，且评分最低的商品信息。
+-- 显示：id,name,price,score,content.
+
+   -- 1. 能查询出最高价格。 A
+         select max(price) from sh_goods
+  --  2. 查询出评分最低。   B
+         select min(score) from sh_goods
+
+  -- 3. 查询价格为A，并且评分为B的商品信息。
+        select id,name,price,score,content
+        from sh_goods
+        where price = (A)
+              and
+              score = (B)
+
+        where (price,score)=(
+				select max(price),min(score) 
+				from sh_goods 
+                              )   --  返回一行多列。
+
+-- from 加 嵌套
+   
+--   查询每个职位的平均工资的等级。
+        select *
+        from t  join  job_grades j
+             on  t.avgsal between lowest_sal and highest_sal
+
+  -- t 表不是真实存在的表，是查询的结果。
+ -- 把查询的语句放在 t 前。
+	select t.job_id,t.avgsal,j.job_grade
+        from （
+		select job_id,avg(salary) avgsal
+       		from employees
+       		group by job_id）t  
+	     join  job_grades j
+             on  t.avgsal between lowest_sal and highest_sal
+
+
+    -- 1. 查询每个职位的平均工资。
+       select job_id,avg(salary)
+       from employees
+       group by job_id
+
+          t
++------------+--------------+
+| job_id     | avg(salary) avgsal  |grade_level | lowest_sal | highest_sal |
++------------+--------------+-----------------------------------------
+| AD_PRES    | 24000.000000 |      E           |      15000 |       24999 |
+| AD_VP      | 17000.000000 |      E           |      15000 |       24999 |
+| IT_PROG    |  6400.000000 |
+| ST_MAN     |  5800.000000 |
+| ST_CLERK   |  2925.000000 |
+| SA_MAN     | 10500.000000 |
+| SA_REP     |  8866.666667 |
+| AD_ASST    |  4400.000000 |
+| MK_MAN     | 13000.000000 |
+| MK_REP     |  6000.000000 |
+| AC_MGR     | 12000.000000 |
+| AC_ACCOUNT |  8300.000000 |
++------------+--------------+
+  job_grades
++-------------+------------+-------------+
+| grade_level | lowest_sal | highest_sal |
++-------------+------------+-------------+
+| A           |       1000 |        2999 |
+| B           |       3000 |        5999 |
+| C           |       6000 |        9999 |
+| D           |      10000 |       14999 |
+| E           |      15000 |       24999 |
+| F           |      25000 |       40000 |
++-------------+------------+-------------+
+
+  shop:
+-- 查询每个商品分类下的最高价格的商品信息.
+     select
+     from  t  join  sh_goods g
+           on t.category_id=g.category_id 
+              and 
+              t.maxp=g.price
+
+
+-- 显示：id，name,price,category_id.
+  -- 1. 查询出每个商品分类的最高价格。显示：
+       select category_id,max(price)
+       from   sh_goods;
+
+         t  
++-------------+------------+
+| category_id | max(price) maxp|
++-------------+------------+
+|           3 |      15.00 | 2 | 钢笔            |   15.00 |           3
+|          12 |    5999.00 |
+|           6 |    1999.00 |
+|           8 |      69.00 |
+|           9 |     109.00 |
+|          10 |    2000.00 |
+|          15 |     299.00 |
+|          16 |      48.00 |
++-------------+------------+
++----+-----------------+---------+-------------+
+| id | name            | price   | category_id |
++----+-----------------+---------+-------------+
+|  1 | 2B铅笔          |    0.50 |           3 |
+|  2 | 钢笔            |   15.00 |           3 |
+|  3 | 碳素笔          |    1.00 |           3 |
+|  4 | 超薄笔记本      | 5999.00 |          12 |
+|  5 | 智能手机        | 1999.00 |           6 |
+|  6 | 桌面音箱        |   15.00 |           8 |
+|  7 | 头戴耳机        |  109.00 |           9 |
+|  8 | 办公电脑        | 2000.00 |          10 |
+|  9 | 收腰风衣        |  299.00 |          15 |
+| 10 | 薄毛衣          |   48.00 |          16 |
++----+-----------------+---------+-------------+
+课后思考题：
+-- 查询每科最高成绩的学生信息。
+-- 显示学号，成绩，科目。
+
+------- having 后加嵌套
+
+  -- 1.哪个职位的平均工资大于公司的平均工资。
+  -- 显示：job_id,平均工资。查询结果根据平均工资降序排序。
+
+   -- 1. 先查询每个职位的平均工资。
+        select job_id，avg(salary)
+         from employees
+         group by job_id
+         having  avg(salary)>(  
+				select avg(salary) from employees
+				--公司的平均工资)
+------------------------------------------------
+  select 后加嵌套：只能加返回一行一列的数据的子查询。
+  
+-- 查询每个部门的人数，及占总公司人数的百分比。
+ -- 显示：department_id,人数，百分比。
+
+    select department_id,count(*) 人数,
+           count(*)/(select count(*) from employees)  as 人数比
+     from employees
+     group by department_id
+
+-- 拼接函数 concat(参数1，参数2..):拼接成一个字符串
+select concat(employee_id,'_',first_name,' ',last_name) as 号_名字
+
+from employees;
+
+----------------------------------------
+   不相关子查询：内外查询无关，从内查询开始，内查询能返回数据。
+
+   相关子查询：
+
+
+ -- 查询哪些员工是其所在部门收入最高的员工，
+ -- 显示：last_name,department_id,salary.
+
+  -- 1. 查询每个部门的最高工资，显示部门号，最高工资。
+
+    select department_id,max(salary) maxsal 
+      from  employees
+     group by department_id;
+
+  t
+department_id     maxsal 
+-------------------------
+	90	24000.00    King	   90    	24000.00
+	60	9000.00     Hunold	   60	         9000.00
+	50	5800.00 
+	80	11000.00
+-----------------------------
+
+last_name  department_id  salary
+-----------------------------
+King	   90    	24000.00
+Kochhar	   90	        17000.00
+De Haan	   90	        17000.00
+Hunold	   60	         9000.00
+-------------------------------------
+
+  select 
+    from  (select department_id,max(salary) maxsal 
+           from  employees
+            group by department_id)
+          t  join  employees e
+          on  t.department_id=e.department_id
+             and t.maxsal=e.salary
+
+
+-------------------------------
+ -- 查询哪些员工是其所在部门收入最高的员工，
+ -- 显示：last_name,department_id,salary.
+ 
+ 
+
+   select last_name,department_id,salary
+    from employees  e1
+   where salary =( select max(salary)
+                   from employees  e2
+                   where  e2.department_id=e1.department_id
+                 )
+外层表的记录                       e2.department_id=e1.department_id
+------------------------------
+	King	90	24000.00   满足：显示                     90
+	Kochhar	90	17000.00   不满足
+	De Haan	90	17000.00
+	Hunold	60	9000.00    
+	Ernst	60	6000.00
+
+   不相关子查询执行原理：
+     先执行外层的查询语句，对于每一行记录进行判断。
+     带入到内层查询，如果满足条件，则外层的这条记录显示。
+                     如果不满足条件，则外层的这条记录不显示。
+
+
+-- 2. 查询哪些员工的工资大于其主管经理的工资，
+--   显示：last_name,department_id,salary. 
+-- 结果根据department_id升序排序。
+
+
+Kochhar	90	17000.00	100
+De Haan	90	17000.00	100
+Hunold	60	9000.00	102
+
+   select last_name,department_id,salary
+
+    from employees  e1
+
+   where salary > ( select salary
+
+                   from employees  e2
+
+                   where e2.employee_id=e1.manager_id
+
+                   
+                   -- 是外面员工的经理
+
+                 );
+-------------------------
+   exists子查询：
+
+    select last_name,department_id,salary
+
+    from employees  e1
+
+   where exists (   select 1
+                    from employees  e2
+
+                    where e2.employee_id=e1.manager_id
+                    and  e1.salary>e2.salary
+                     
+                                    
+                  
+ -- 是外面员工的经理
+
+                 );
+
+ --  若存在sh_goods_category存在名称为"厨具"的分类时，
+ -- 将sh_goods表中id等于5的商品名称修改为电饭煲，价格修改为400，
+ -- 分类修改为“厨具”对应的id.
+
+  -- sh_goods_category：（id,name）
+ -- sh_goods(id,name, category_id) 外键
+
+     update sh_goods
+      set  name='电饭煲'，price='400',
+           category_id=( select id from sh_goods_category
+                          where name='厨具' -- 查询出厨具对应的id)
+     -- where  （ -- 判断是否存在'厨具'的id）
+     where exists（select id from sh_goods_category
+                          where name='厨具'）
+            and id=5
+-------------------------------
+  any,all,union,union all
+
+ -- 1.all
+ --  查询比60号部门工资都高的员工的信息。
+ -- 显示:last_name,salary.
+  
+    -- 比60号部门工资最高的高。
+      select last_name,salary
+        from employees 
+       where salary>( select max(salary)
+                      from employees
+                      where department_id=60
+                     )
+
+    select last_name,salary
+        from employees 
+       where salary >all( select  salary
+                      from employees
+                      where department_id=60
+                     )
+
+  >all  相当于 > ( select max())
+  <all  相当与 < ( select min())
+
+ -- 查询比60号部门任意员工工资高。
+   -- 比60号最小工资高。
+      select last_name,salary
+        from employees 
+       where salary>( select min(salary)
+                      from employees
+                      where department_id=60
+                     )
+          
+      select last_name,salary
+        from employees 
+       where salary>any( select salary
+                         from employees
+                         where department_id=60
+                         )
+         
+    >any 相当  >( select min())
+    <any 相当  < ( select max())
+
+  -- union / union all
+     union:去重复。
+     union all：不去重。推荐，效率高。
+   -- 1. 查询60号和80号部门的职工信息。
+
+    -- 1.查询60号部门的
+       select last_name,salary,department_id
+         from employees
+       where department_id=60
+       union
+       select last_name,salary,department_id
+         from employees
+       where department_id=80
+------------------------------------
+ 视图：实质是一个查询语句。select..
+
+视图的定义：视图是虚表。视图的列和数据来自于基本表。
+
+
+视图的优点：
+  1. 简化查询语句。
+  2. 安全机制。
+  3. 数据独立性。
+    视图可以帮助用户屏蔽数据表结构变化带来的影响。
+
+
+-- 1.创建视图：
+   create view 视图名(列名1，列名2..)  -- 和select后一致
+   as 
+      select 
+      from...
+
+  -- 例1：创建视图v_emp（员工号，员工名，工龄）
+
+    -- 1. 查询语句:
+   create view v_emp(员工号,员工名,工龄)
+   as
+   select employee_id,last_name,year(now())-year(hire_date)
+     from employees
+
+  -- 基于多表的视图：
+  --  创建视图：v_emp_d_loca(职工名，工资，部门名，城市)
+    
+    -- 1.先写查询：
+      create view v_emp_d_loca(姓名,工资,部门名,城市)
+
+      as
+         select e.last_name,e.salary,d.department_name,
+             ca.city
+         from employees e join departments d
+             on e.department_id=d.department_id
+             join locations ca
+             on d.location_id = ca.location_id
+      
+   -- 查询居住在Toronto的员工姓名。
+     
+  -- 提高查询效率？没有。
+   因为视图是虚表，就是一个查询语句，使用视图的时候，
+   先去执行查询语句。
+
+  -- 修改视图：
+   create or replace view（）
+
+  -- 删除视图：
+    drop view  视图名；
+
+ DML:增删改  --查 。
+  1. 向视图v_emp插入一行数据。
+    insert into v_emp(员工号，员工名)
+    values('1111','zhangsan');
+
+-- 只有来自于一个表，表中原来的列。有可能增删改。
+ -- 视图主要用来查询，尽量不要进行数据的增删改。
+
+
+create or replace view v_stu_jsdept
+
+as
+
+	select sno,sname,ssex,sdept
+
+	from student
+
+	where sdept='计算机系'
+    
+        with check option;
+    
+
+-- 向v_stu_jsdept插入(111,李强，男，数学系)；
+
+insert into v_stu_jsdept
+ values('112','李强','男','数学系');
+  会出错， 因为检查，不能插入其他系的学生，只能插入
+  计算机系的学生。
+--------------------------------------------------
+  shop数据库：
+
+  -- 1. 创建视图view_goods（商品号，商品名，价格）。
+    
+
+  -- 2. 创建视图view_goods_cate（商品号，商品名，
+        分类名）
+
+  -- 3.创建视图v_cate（分类号，分类名）,
+       该视图检查条件是分类号小于30.
+
+-------------------------------------------------
+  用户与权限：
+  
+ 一、用户字段：mysql.user:复合主键（user，host）
+    user字段：用户的名称。不超过32字符。
+    host字段：允许访问mysql服务器的用户端的IP地址或主机地址。
+
+ 二、权限属性：_priv结尾的属性
+ 三、资源控制属性：max_questions:每小时允许用户执行查询操作的最多次数。
+ 四、安全连接字段：ssl_tpye:4个证书
+ 五、用户身份验证字符：密码
+       plugin:
+       authentication_string:密码加密后的密文。
+
+ 创建用户：
+   create user 用户名@主机名；
+
+   账户：用户名@主机名
+   主机名:ip地址或字符串。
+         localhost:本机地址。%：表示允许任何主机连接mysql服务器。
+
+   -- 例1：创建用户名为test1，本地登录的用户。
+      create user 'test1'@'localhost';
+
+  -- 验证：用户名test1能否登录mysql服务器。
+   1. 退出当前root登录。quit 回车
+   2. mysql -utest1 回车 登录。
+   3. 进入到mysql服务器，不能进行其他操作。没有被赋予权限。
+
+
+  -- 例2：创建用户名test2,任何主机都能登录。
+       create user 'test2'@'%' ;
+       或者
+       create user 'test2' ; -- 默认 任何主机都能登录。
+
+  创建用户时设置用户身份验证选项：
+    create user  '用户名'@'地址' identified by ‘密码’；
+
+   -- 例：创建本地用户名user_1,密码123456.
+    create user 'user_1'@'localhost' identified by '123456';
+
+  -- 查询用户名为user_1的密码。
+   select plugin,authentication_string from mysql.user
+   where user='user_1';
+      
+  创建密码时设定密码管理选项：密码立即过期。password expire.
+  -- 创建shop用户，可通过IP地址“192.168.1.%”范围内的客户登录
+     mysql服务器，初始密码123456，并且将密码设置为登录后立即过期。
+    
+    create user 'shop'@'192.168.1.%' identified by '123456' 
+    password expire;
+
+   create user 'shop'@'localhost' identified by '123456' 
+    password expire;
+
+
+  二、修改用户：
+    alter user ‘用户名’@‘主机号’ identified by ‘新密码’ ;
+ 
+   alter user 'shop'@'localhost' identified by '123456nn' 
+    password expire;
+  三、删除用户：
+    drop user ‘用户名’@‘主机名’；
+
+  -- 删除所有普通用户。
+-------------------------------
+ 权限分配：
+    授予权限：grant
+    回收权限：revoke
+
+  一、权限级别：
+      *.*:全局权限。可以给任意数据库中的任意内容授予权限。
+      数据库名.*:数据权限，可以给指定数据库中的任意内容授权权限。
+      数据库名.表名：表权限，可以给指定的数据库中的指定的表授予权限。
+      数据库表：列权限：可以给指定的数据库的指定的表中的指定列授予权限。
+
+  二、权限类型：select,update,insert,delete.
+ 
+  三、权限授予：
+    grant 权限类型
+       on  权限级别
+       to  账户名；
+
+  -- 1.创建本地用户‘test1’，给用户test1授予shop.sh_goods表的
+       select权限，以及对name和price字段的插入权限。
+
+      create user 'test1'@'localhost';
+      grant select,insert(name,price)
+         on  shop.sh_goods
+         to  'test1'@'localhost';
+
+  -- 验证：
+    1. 退出root登录。
+    2. 以 test1 登录mysql服务器。
+    3. 对表sh_goods进行查询。
+    4. 对sh_goods（name,price)进行插入操作。
+
+   -- 2. 为test1用户授予对shop.sh_goods_category表的update和select权限。
+     grant select,update
+         on  shop.sh_goods_category
+         to  'test1'@'localhost';
+
+  -- 回收权限：
+     revoke 权限类型
+       on  权限级别
+       from  账户名；
+-------------------------------------
+  事务：
+  
+  1.创建一个数据库：myTran
+   
+  2.创建表account
+     create table account(
+      id int primary key auto_increment,
+      name varchar(20),
+      money int
+  );
+  3.插入数据： 张三  2000，李四  2000
+   insert into account values(0,'张三',2000); 1000
+   insert into account values(0,'李四',2000); 3000
+                                        4000  4000
+
+  4.一个事务：转账：张三给李四转1000.
+    分两步：
+     第一步：张三 的money减1000.
+      update account 
+         set money=money-1000
+       where name='张三';
+     
+     第二步：李四的money+1000
+      update account
+        set money=money+1000
+       where name='李四';
+
+ 事务：数据的一组操作完成。可以右一条或多条SQL语句组成。
+      且每个SQL语句是互相依赖的。
+      在事务执行的过程中，只要有一个SQL语句执行失败或发生错误，
+      则其它语句都不会执行。
+      也就是说，事务的执行要么全部成功，要么就返回到事务开始之前
+      的状态。
+ 四个特性：ACID
+   1.原子性（atomicity）：事务必须被视为一个不可分割的最小工作单元。
+             只有事务中的所有数据操作都执行成功，整个事务才算执行成功。
+             如果有以SQL语句失败，已经执行成功的SQL语句也必须撤销。
+   2.一致性(consistency)：无论事务成功还是失败，数据库系统处于一致状态。
+             日志记录数据的所有变化，为事务恢复提供跟踪记录。
+   3. 隔离性(isolation)：当一个事务在执行时，不会受到其他事务的影响。
+              隔离性主要通过并发控制，可串行化和锁的相关技术来实现。
+
+   4. 持久性(durability)：是指事务一旦提交，对数据库的修改就是永久性的。
+
+-------------------------------------
+  默认情况下，用户执行的每一条SQL语句都被会被当成单独的事务自动提交。
+  
+  1.查看事务的状态：
+     select @@autocommit;
+
+
+   开启事务：
+    start transaction;
+
+      SQL1
+      SQL 2
+      ....
+   commit ; -- 提交事务。
+   rollback; -- 事务回滚。回滚到事务执行前的状态。
+  
+ 注意：
+  mysql的事务主要针对数据的处理，不包括创建或删除数据库，表，修改表等
+  操作，这类操作都是隐式提交事务。
+  InnoDB：数据库存储引擎支持事务。
+  MyISAM：不支持事务。
+
+ -------------
+ 练习：
+  利用事务实现：用户下订单后，订单表sh_order_goods中对应的订单的
+    商品数量大于实际商品sh_goods库存量时，取消sh_order_goods表中
+    数据的添加。
+  
+   开启事务：
+ 
+   事务：
+    1步：下单：
+        insert into sh_order_goods(order_id,goods_id,goods_num)
+        values(1,2,400);
+    2步：修改商品库存量：
+         update sh_goods
+            set stock=stock-400 -- 如果商品库存量<购买数量，修改失败（stock>=0）
+          where id=2;
+
+   第2步失败：事务回滚；
+-------------------------------------------------------
+   事务的隔离性：
+
+  1. 读取未提交：read uncommitted；
+    脏读：读取了事务没有提交的数据。
+
+
+       事务A                            事务B（骗子）
+  设置隔离级别：读取未提交
+  1.set transaction isolation 
+    level read uncommitted;
+
+  2.开始事务：start transaction;
+   
+  3.查看张三的余额：
+    select money from account 
+    where name='张三';（1000）
+                                     1. 开启事务：
+                                       start transaction
+
+                                     2.转账给张三 1000.
+  4.张三查看余额：
+    select money from account 
+    where name='张三';（2000）
+    -- 脏读。读取了事务没有提交的数据。
+    发货；
+                                     3.收到货：rollback;
+
+  5. 账单查看余额：1000
+
+  事务提交
+------------------------------------------------------------------
+   解决脏读：设置事务A的隔离级别：读取已提交。避免“脏读”问题。
+
+二、读取已提交： read committed；
+ 
+         事务A                            事务B（骗子）
+  -- 设置隔离级别：读取已提交
+  -- 1。
+    set transaction isolation 
+    level read committed;
+
+  2.开始事务：start transaction;
+   
+  3.查看张三的余额：
+    select money from account 
+    where name='张三';（1000）
+                                     1. 开启事务：
+                                       start transaction
+
+                                     2.转账给张三 1000.
+  4.张三查看余额：
+    select money from account 
+    where name='张三';（2000）
+    -- 脏读。读取了事务没有提交的数据。
+    发货；
+                                     3.收到货：rollback;
+
+  5. 账单查看余额：1000
+
+  事务提交
+-------------------
+    事务A                                               事务B(骗子)
+设置隔离级别：读取已提交：read committed
+set transaction isolation level  read committed;
+start transaction
+                                                      start transaction
+ 查询张三余额。3000
+																									
+						      转账给张三1000.
+ 查询张三余额。3000
+  发货
+                                                      
+						      提交事务；
+ 查询张三余额。4000（不可重复读）.
+							
+ 提交事务；
+
+----------------------------------------------------------------
+
+
+
+不可重复读：在一个事务中多次查询一条记录，出现数据不一致。
+            因为有其它事务对这个记录进行了修改。
+
+升级隔离级别：可重复读（repeatable read）
+
+                        
+    事务A                                               事务B(骗子)
+设置隔离级别：可重复读（repeatable read）
+set transaction isolation level  repeatable read;
+start transaction
+                                                      start transaction
+ 查询张三余额。6000
+																									
+						      转账给张三1000.
+ 查询张三余额。6000
+  
+                                                      
+						      提交事务；
+ 查询张三余额。6000
+							
+ 提交事务；
+ 查询张三余额。7000.
+
+----------------------------------------------------------------
+
+3. 幻读：
+
+
+把事务A的隔离级别设置为：读取已提交（read committed）。
+                         
+    事务A                                               事务B(骗子)
+设置隔离级别：读取已提交：read committed
+set transaction isolation level  read committed;
+start transaction
+                                                      start transaction
+ 查询余额小于1万的记录。4 条
+																									
+						      插入赵四 5000.
+ 
+                                                      
+						      提交事务；
+ 查询余额小于1万的记录。5。（幻读）.
+							
+ 提交事务；
+
+----------------------------------------------------------------
+解决 幻读和不可重复读：
+设置隔离级别：repeatable read；解决幻读。
+
+
+                        脏读             不可重复读             幻读
+
+  read uncommitted       有                   有                  有
+  read   committed       没有                 有                  有
+  repeatable read        没有                 没有                没有
+
+----------------------------------------------------------
+ 数据库编程：
+  
+  1. 函数：完成特定功能的代码。
+  2. 内置函数：
+    数据函数
+    字符串函数
+    日期和时间函数
+
+ -- 给出出生日期，计算年龄。
+   datediff（现在日期，入职日期）：返回 前面日期 和后面日期的天数差。
+   
+   select last_name,salary,datediff(now(),hire_date)/365 as 工龄
+   from employees;
+
+   year(now())-year(hire_date)
+
+ -- round(数值，小数位数)：对数值进行四舍五入。
+  select last_name,salary,
+        round(datediff(now(),hire_date)/365,1) as 工龄
+   from employees;
+ 
+ -- truncate(数值，小数位数):截断。不进行四舍五入。
+
+  内置函数：select后 
+
+-----------------------------------
+
+变量：
+ 1. 全局变量：@@
+
+ 2.用户自定义变量：@name 声明一个变量。必须赋值。
+               方式1：  set  @name='tom';
+               方式2：  select @name:= 'tom';
+               方式3： select    into     
+ 
+ 3. 局部变量：begin   
+		 declare  name  varchar(20);
+              end 
+
+
+ 存储过程：
+   
+  -- 创建一个存储过程：查询学生人数；
+  
+     select count(*) from student;
+
+  -- 
+-------------------------------------
+   控制流程：
+    1.  顺序流程：
+    2.  分支
+    3.  循环
+ 
+二、分支：
+  1.SQL语句中的分支结构：
+	case
+	    when 条件1  then  表达式
+ 	    when 条件1  then  表达式
+            when 条件1  then  表达式
+             ..
+            else 表达式
+       end 别名
+
+  -- 1. 查询学生的学号，成绩，等级
+   ：85分以上 优秀；60~85 及格；60分以下 不及格。
+
+-- 练习：查询职工的id，last_name,工资：
+     10000以下：  '实习工资'
+      10000~20000   ‘转正工资’
+     20000以上   ‘元老工资’。
+
+ ------- 2.存储过程中写分支---
+        case
+	    when 条件1  then   语句列表； -- select ‘优秀’
+ 	    when 条件2  then   语句列表；
+            when 条件3  then   语句列表；
+             ..
+            else 语句列表；
+       end case；
+   语法2：if
+       
+       if 条件1      then   语句列表； -- select ‘优秀’
+ 	    elseif 条件2  then   语句列表；
+            elseif 条件3  then   语句列表；
+             ..
+            else 语句列表；
+       end if；
+
+-- 创建存储过程，输入学生的学号，判断他的成绩等级。优秀，及格，不及格
+ --  85分以上 优秀；60~85 及格；60分以下 不及格。
+
+
+--- 二、循环：
+   while 条件  do  条件为真 true 执行循环体；
+       语句列表；
+   end while;
+
+   repeat
+      语句列表
+    until 条件   -- 条件为真 结束循环，条件为false 结束循环。
+   end  repeat；
+
+ -- 1. 创建存储过程：10以内偶数和。
+
+------------------------------------
+  异常处理：
+
+  1、 错误类型：ERROR 1046 (3D000):
+     数值型：1046
+     字符型：sqlstate '3D000'
+
+   sql warning:匹配01开头的sqlstate错误代码
+    not found:匹配02开头的sqlstate错误代码
+   sqlexception:匹配除了01,02开头的sqlstate错误代码
+
+  
+ 2、 错误处理方式：
+    1. continue:继续运行
+    2. exit：退出
+
+一、自定义处理错误程序：
+    declare 处理方式 handler for 错误类型  
+        处理语句；
+  
+ -- 例1：创建存储过程：主键重复时，程序继续执行。
+   error：1062  ‘23000’
+
+ -- 例2：创建存储过程：完成一个事务（一组SQL操作），当事务成功，提交，
+    事务错误，回滚。
+   
+    insert into student
+    values('666','张三',null,null,null);
+    insert into student
+    values('666','李四',null,null,null);
+     update student set sdept='数学系' where sno='666';
+     update student set sdept='数学系' where sno='9512101';
+--------------------------------------
+ 游标：通过游标可以获取查询结果集的某条记录。
+
+
+ 使用游标：4步骤.
+  
+  1. 定义游标：
+     declare 游标变量 cursor for select 列1，列2 from...
+
+  2. 打开游标：
+      open  游标变量;
+
+  3. 利用游标检索数据：（循环遍历）
+   fetch 游标变量 into 变量1，变量2；-- 变量的个数和顺序和定义select后的列一致。
+
+  4. 关闭游标：
+    close 游标变量；
+
+-- 例1：创建存储过程：sh_goods评分是5分，并且库存量小于400的商品的库存量
+        增加到1500.
+
+      update sh_goods
+         set stock=1500
+       where score=5 and stock<400;
+  
+   
+
+
+
+
+
+
+   
+    
+
+    
+     
+
+  
+
+
+
+  
+   
+             
+
+ 
+    
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                 

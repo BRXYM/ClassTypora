@@ -1,0 +1,211 @@
+-- 总复习：
+
+-- 20个选择
+ 40
+-- 10个填空
+
+-- 3个简答  15
+-- 设计题   10
+-- sql编程   25
+
+一、数据库设计
+  1.DB,DBMS,DBS的含义及关系：
+  2.数据库设计的步骤：
+      需求分析：
+      概念设计：E-R实体联系模型。
+                联系类型：1:1,1：n，n:m
+      逻辑设计：表。转换的原则。
+      物理设计：DBMS承担
+      实施和维护：
+  3.范式分析：在逻辑设计之后进行检验表是否满足三范式。
+       掌握把表分解到三范式。
+
+二、SQL部分
+  1、DDL: create,alter,drop
+     (1)常用命令：查看数据库
+ 	       查看数据库的所有表
+	       查看表的结构:desc 
+	       查看创建表:
+     (2)数据库及表的创建：
+     (3)表的创建：数据类型，数据约束。
+        数据类型：数值型，字符型，日期型
+            int(10):4个字节。10不是存储空间，是表示格式。如果数据显示的长度大于10，不受影响。
+	       1234
+           char(10):固定分配10个字符的长度。
+	   varchar(10):根据实际输入的数据分配不超过10个字符的长度。
+                      张三  2个；王丽丽 3个。
+            decimal(10,2)：10表示一共的位数（整数位+小数位）。
+                           2表示小数位数。
+            float(10,2):精度损失。一共位数大约6位。
+            double(10,2):精度损失。
+            datetime：输入格式'2013-3-3'.
+        数据约束：
+            主键：primary key 约束数据：非空不重复。必须有且一个
+            外键：共同的属性。
+             foreign key(外键) references 主表(主键)  -- 约束从表插入或修改
+             on delete  restrict | cascade | set null 
+             on update  restrict | cascade | set null ；
+
+           从表：如果插入或修改数据：外键值来源与主表或为null。
+           主表：如果删除或修改数据：主键值如果在外键值中使用，则不能删除。
+
+            用户自定义：not null,check,default ，unique.
+               check(score>0 and score<=100)
+                default '男'
+      （2）、修改表：
+         添加列:
+         修改列的数据类型：modify 
+         删除列：alter table 表名 drop column 列名；
+      （3）、删除表：drop table 表名； 
+     
+     删除表中的数据：delete  from 表名；
+    auto_increment
+----------------------------------------------------
+ 三、DML（insert,update,delete） select 
+     1 insert语法：
+
+        insert into 表名()
+        values()               -- 必须和表的列个数，顺序，数据类型一致
+
+     2 update         -- 数据是字符型或日期型：用单引号。
+     3.delete：
+----------------------------------------
+ 四、 查询：
+ 5 select    distinct 列名 别名
+ 1 from
+ 2 where    -- 不能写别名
+ 3 group by
+ 4 having     -- 不能写别名
+ 6 order by   -- 可以用别名
+ 7 limit 初始位置，行数；
+
+  从第5条记录，显示4条
+  limit 4,4
+
+  stu(id,name,sex,birth,major)
+  course(id,name,credit)
+  xuanke(sid,cid,score)
+ 1. 查询年龄18~22,
+   并且专业是‘外语’或‘计算机’的学生信息。
+   select *
+     from stu
+     where  year(now())-year(birth) between 18 and 22
+            and  major in('外语','计算机');
+            （major='外语' or major='计算机'）
+           datediff(now(),birth)/365 
+
+ 2.查询选修'c11'课程成绩最高的学生信息，显示学号，成绩。
+ (不考虑并列情况)
+    
+
+select sid,score
+       from xuanke
+     where  cid='c11' 
+      order by score desc
+      limit 0,1;
+
+    select sno,score  -- 考虑并列情况
+      from  xunake
+     where cid='c11'
+           and score =( select  max(score) 
+			from sc where cid='c11')
+   
+ 3.查询和张三同龄的学生信息。
+
+     select *
+       from stu
+      where year(birth)=(select year(birth) 
+			from stu where name='张三')；
+
+ 4.查询选修了java的学生姓名。course,stu
+
+     select s.name
+      from  course c join sc s1 on c.id=s1.cid
+                     join stu s on s.id=s1.sid
+     where c.name='java'
+
+     from course c,sc s1,stu s
+     where c.id=s1.cid and s.id=s1.sid and c.name='java'
+
+ 5.查询每个学生的选课门数，平均分，显示平均分大于70分
+   的学生信息。
+         select sid，count(*) 门数，avg(score) 平均分
+          from sc
+      group by sid
+        having avg(score)>70
+
+ 6. case
+      when   then
+    end
+
+ 子查询：
+    子查询返回的数据个数：
+      标量子查询:=，<,>
+      列子查询（in），
+      行子查询（or，and）；
+    比较运算符；
+     (X,Y）=(A,B)
+
+    表子查询。
+    from (子查询) as 表
+
+ 相关子查询：exists 从外层查询开始。
+  
+ 嵌套查询：一个select语句可以嵌入在（select,update,delete）
+  删除李勇的所有成绩。
+  delete from sc
+  where sid=( select sid from stu where name='李勇')
+
+ 二、视图：
+   1. 视图的定义及优点：
+   2. 视图的创建
+   3. 视图的更新（with check option）:
+      对视图数据的更新是有条件的。
+      with check option:对视图数据更新要满足where条件。
+ 三、数据库权限DCL
+    grant 权限  on 级别 to 用户@主机；
+
+ 四、事务：只有InnoDB数据库引擎支持事务。
+   1. 事务的概念及特点
+   2. 事务的处理方式：
+       start transaction;
+         一组sql；
+       commit;
+       rollback;
+       
+   3. 事务的隔离性:三种隔离级别
+       脏读；不可重复读，幻读。
+      
+ 
+----------------------
+ 三、数据库编程:
+    1 变量：局部变量
+           declare 变量名  数据类型 default 初始值；
+    2.存储过程：概念及特点。
+
+    3.异常处理：
+     declare continue handler for 错误类型
+
+    4. 游标：使用游标4个步骤。
+        1. declare ... cursor for...
+        2. open 
+        3. fetch  into
+        4. close
+
+    5.触发器：定义及优缺点。
+      
+
+
+
+
+ 
+
+
+
+
+
+         
+  
+
+	
+ 
