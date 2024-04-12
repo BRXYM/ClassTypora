@@ -1179,12 +1179,14 @@ int main() {
 
 - 友元是给予，不是索取
 - 友元关系既不对称，也不传递
+- 友元**不属于类中成员**
+- 友元函数的参数一般是**对象引用参数**
 
 **友元的分类**
 
-1. 友元函数
-2. 友元成员
-3. 友元类
+1. **友元函数**
+2. **友元成员**
+3. **友元类**
 
 ### 友元的定义
 
@@ -1199,6 +1201,10 @@ int main() {
 **缺点**
 
 - 破坏了类的封装性和隐蔽性，尽量少用
+
+
+
+### 友元函数
 
 ```c++
 #include "bits/stdc++.h"
@@ -1222,6 +1228,162 @@ void show(Time &t) {//函数参数是对象的引用
 int main() {
     Time t(11, 30, 35);//创建对象，调用构造函数
     show(t);//调用友元函数，因为不属于类中函数，所以不需要对象调用
+}
+```
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Student {
+private:
+    string sname;
+    int sno;
+public:
+    Student(string sn, int sno) : sname(sn), sno(sno) {}
+
+    Student() {}
+
+    //声明友元函数show
+    friend void show(Student &student);
+
+};
+
+
+void show(Student &student) {
+    cout << "姓名:" << student.sname << "学号:" << student.sno << endl;
+}
+
+class Score {
+private:
+    unsigned int chinese, math, english;//无符号整数
+public:
+    //定义构造函数初始化
+    Score(int chinese, int math, int english) : chinese(chinese), math(math), english(english) {}
+
+    Score() {}
+
+    //声明友元函数，display
+    friend void display(Student &student, Score &score);
+};
+
+void display(Student &student, Score &score) {
+    show(student);
+    cout << "语文：" << score.chinese << "数学：" << score.math << "英语：" << score.english << endl;
+}
+
+int main() {
+//    Student student("胡桃",1);//创建学生对象
+//    Score score(90,95,80);//创建成绩对象
+//
+//    display(student,score);
+    string sname;
+    int sno;
+    unsigned int chinese, math, english;//无符号整数
+
+    Student student[3];
+    Score score[3];
+
+
+    for (int i = 0; i < 3; ++i) {
+        cout << "请输入第" << i + 1 << "个学生的姓名，学号"<<endl;
+        cin >> sname >> sno;
+        student[i] = Student(sname, sno);
+        cout<<"输入第"<<i+1<<"个学生成绩(c,m,e)"<<endl;
+        cin>>chinese>>math>>english;
+        score[i] = Score(chinese,math,english);
+    }
+
+    for (int i = 0; i < 3; ++i) {
+        display(student[i],score[i]);
+    }
+    
+}
+```
+
+
+
+### 友元成员
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Date;//声明类
+
+class Time {
+private:
+    int hour, minute, second;
+public:
+    Time(int hour, int minute, int second) : hour(hour), minute(minute), second(second) {}
+
+    Time() {}
+
+    void show(Date &date);//声明成员函数
+};
+
+class Date {
+private:
+    int year, month, day;
+public:
+    Date(int year, int month, int day) : year(year), month(month), day(day) {}
+
+    Date() {}
+
+    friend void Time::show(Date &date);//友元成员
+};
+
+void Time::show(Date &date){//友元函数实现，也是类Time的外联函数
+    cout<<date.year<<"/"<<date.month<<"/"<<date.day<<"  ";
+    cout<<hour<<":"<<minute<<":"<<second<<endl;
+}
+
+int main() {
+    Date d(2024,4,12);
+    Time t(8,58,30);
+    t.show(d);//时间对象调用show输出所有
+}
+```
+
+
+
+### 友元类
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Student {
+    friend class Score;
+
+private:
+    string name, sno;
+public:
+    Student(string name, string sno) : name(name), sno(sno) {}
+};
+
+class Score {
+private:
+    int chi, math, eng;
+public:
+    Score(int chi, int math, int eng) : chi(chi), math(math), eng(eng) {}
+
+    void show(Student &student) {
+        cout << "学生姓名" << student.name << "学生学号" << student.sno << endl;
+        cout << "语文成绩：" << chi << "，数学成绩：" << math << "，英语成绩：" << eng << endl;
+    }
+};
+
+int main() {
+    Student student[2]={Student("胡桃","101"),Student("心海","102")};
+    Score score[2] = {Score(99,88,98),Score(88,98,88)};
+
+    for (int i = 0; i < 2; ++i) {
+        score[i].show(student[i]);
+    }
 }
 ```
 
