@@ -441,6 +441,8 @@ int main() {
 
 ## 第三章 类与对象
 
+主函数中，只能调用类中**共有成员**
+
 ### 创建类与对象
 
 ```c++
@@ -643,7 +645,7 @@ int main() {
     //单独使用setprecision(4)<<c<<endl;
 
     cout << fixed << setprecision(2) << c << endl;
-    //用fixed与setprecision(n)联用:n表示小数部分保留的位数
+    //用fixed与setprecision(n)联用:n表示小数部分的位数
 
     cout << setw(5) << x;
     cout << setw(5) << y << endl;
@@ -1386,4 +1388,525 @@ int main() {
     }
 }
 ```
+
+
+
+## 第五章 继承
+
+- 共有继承
+- 私有继承（**默认继承模式**）
+- 受保护继承
+
+### 继承
+
+**默认继承方式**
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Student{
+private:
+    string sname;
+    int sno;
+public:
+    Student(){}
+    void set(string name,int no){
+        sname = name;
+        this->sno = no;
+    }
+    void show(){
+        cout<<"姓名："<<sname<<",学号："<<sno<<endl;
+    }
+};
+
+class SchoolStu:Student{//默认的继承方式是private
+private:
+    string type;//班级类型（文理）
+public:
+    void setInfor(string t,string name,int no){
+        this->set(name, no);//继承父类中的函数
+        type = t;
+    }
+    void display(){
+        this->show();
+        cout<<"班级类型："<<type<<endl;
+    }
+};
+
+class UniversityStu:Student{
+private:
+    string major;//专业
+public:
+    void setUS(string name,int no,string m){
+        this->set(name,no);//继承父类中的函数
+        major = m;
+    }
+    void print(){
+        show();
+        cout<<"专业："<<major<<endl;
+    }
+};
+
+int main() {
+    SchoolStu schoolStu;//创建子类对象
+    schoolStu.setInfor("理科","胡桃",101);
+    cout<<"高中生信息如下："<<endl;
+    schoolStu.display();
+    UniversityStu universityStu;
+    universityStu.setUS("钟离",201,"岩系");
+    cout<<"大学生信息如下："<<endl;
+    universityStu.print();
+}
+```
+
+
+
+### 公有继承
+
+- 父类中的私有（**private**）成员变量**无法继承**
+- 父类中继承的成员的**权限保持不变**
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Father {
+public:
+    string name;//共有属性
+protected:
+    int age;//受保护的数据成员
+private:
+    int weight;//私有数据成员
+};
+
+class Son : public Father {//共有继承，父类中继承的成员的权限保持不变
+public:
+    void show() {
+        cout << this->name << "," << this->age << endl;
+    }
+};
+
+class GrandSon : Son {//私有继承
+public:
+    void display() {//能够继承父类中非私有的成员
+        cout << this->name << "," << this->age << endl;
+    }
+};
+
+int main() {
+    Father father;
+    father.name;//主函数中，只能调用类中公有成员
+    //protected:只能在奔雷及子类类体中使用
+    Son son;
+    son.name;
+//  son.age;
+    //error,age是受保护的，无法在父类及子类之外的地方访问
+}
+```
+
+
+
+### 受保护继承
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Father {
+public:
+    string name;//共有属性
+protected:
+    int age;//受保护的数据成员
+private:
+    string ID;//私有数据成员
+};
+
+class Son : protected Father {//受保护的继承方式，父类中非私有的都可以继承
+    //父类中能继承的成员在子类中的权限都变成protected
+public:
+    void show() {
+        cout << this->name << "," << this->age << endl;
+    }
+};
+
+class GrandSon:Son{
+public:
+    void display(){
+        cout << this->name << "," << this->age << endl;
+    }
+};
+
+
+int main() {
+    Son son;
+    son.show();
+    //s.name;error.name在父类Son中权限变成protected，所以无法类外访问
+}
+```
+
+
+
+### 私有继承
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Father {
+public:
+    string name;//共有属性
+protected:
+    int age;//受保护的数据成员
+private:
+    string ID;//私有数据成员
+};
+
+class Son : private Father {
+    //私有的继承方式（private），父类中菲私有的都可以访问父类中能继承的成员在子类中的权限都便曾受保护的（private）
+    //父类中name，age在子类中都变成private权限
+public:
+    void show() {
+        cout << this->name << "," << this->age << endl;
+    }
+};
+
+class GrandSon:Son{
+public:
+    void display(){
+        //name，age在son类中都变成private权限，所以无权访问
+//        cout << this->name << "," << this->age << endl;
+    }
+};
+
+int main() {
+    Father father;
+    father.name;
+    //protected：只能在本来及子类类体中使用    
+    Son son;
+    son.name;//name权限不足，public
+    //son.age;受保护的，无法在父类与子类中调用
+    son.show();
+    //s.name;error.name在父类Son中权限变成protected，所以无法类外访问
+}
+```
+
+
+
+### 构造函数初始化
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+class Animal {
+private:
+    string name;
+    int age;
+public:
+    //构造函数初始化
+    Animal(string n, int a) : name(n), age(a) {}
+
+    void show() {
+        cout << "姓名: " << name << "年龄: " << age << endl;
+    }
+};
+
+class Cat : public Animal {
+private:
+    string name;
+    int age;
+    string type;
+public:
+    //子类构造函数形参列表:父类构造函数形参列表，子列形参列表
+    Cat(string n, int a, string t) : Animal(n, a), type(t) {}
+
+    void display() {//与父类函数同名，隐藏父类的方法(不是重写)
+        Animal::show();//调用父类中同名的函数，需要加作用域
+        cout << "类型: " << type << endl;
+    }
+};
+
+class Dog : public Animal {
+private:
+    string broods;
+public:
+    Dog(string n, int a, string b) : Animal(n, a), broods(b) {}
+
+    void show_display() {
+        Animal::show();
+        cout << "类型: " << broods << endl;
+    }
+};
+
+int main() {
+    Cat c("胡桃", 20, "火系");
+    c.show();
+    Dog d("心海", 20, "水系");
+    d.show_display();
+}
+```
+
+
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+class A {
+private:
+    string a;
+public:
+    A(string a) : a(a) {}
+
+    void show() {
+        cout << a << endl;
+    }
+};
+
+class B {
+private:
+    string b;
+public:
+    B(string b) : b(b) {}
+
+    void print() {
+        cout << b << endl;
+    }
+};
+
+class C : public A {
+private:
+    int c;
+    B b;//对象成员
+public:
+    //子类构造函数形参列表:父类构造形参列表，对象成员形参列表，自己的形参列表
+    C(string a, string b, int c) : A(a), b(b), c(c) {}//b(b):通过对象成员引用
+    void display() {
+        this->show();
+        cout << "c=" << c << endl;
+        b.print();
+        cout << c;
+    }
+};
+
+int main() {
+    B b();
+    C c("23", "24", 12);
+    c.display();
+}
+```
+
+
+
+
+
+### 析构函数初始化
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+class A {
+public:
+    A() {
+        cout << "a\n";
+    }
+
+    ~A() {
+        cout << "aa\n";
+    }
+};
+
+class B : public A {
+public:
+    B() {
+        cout << "b\n";
+    }
+
+    ~B() {
+        cout << "bb\n";
+    }
+};
+
+class C : public B {
+public:
+    C() {
+        cout << "c\n";
+    }
+
+    ~C() {
+        cout << "cc\n";
+    }
+};
+
+int main() {
+    //A a;
+    //B b;
+    //C c;
+    //构造函数执行顺序
+    //父类构造函数->对象成员的构造函数->子类构造函数
+    //A a;
+    //B c;(构造函数及析构函数调用过程中与对象名字无关)
+    //析构函数执行顺序
+    //子类构造函数->对象成员的析构函数->父类构造函数
+}
+```
+
+
+
+## 练习
+
+### 矩形相等
+
+输入两个矩形长宽，判断两个矩形是否面积相等
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Rectangle {
+private:
+    double length, width;
+public:
+    Rectangle(double l, double w) : length(l), width(w) {}
+
+    Rectangle() {}
+
+    double Area() {
+        return length * width;
+    }
+
+    friend bool isEqual(Rectangle &rectangle1, Rectangle &rectangle2);
+};
+
+bool isEqual(Rectangle &rectangle1, Rectangle &rectangle2) {
+    return rectangle1.Area() == rectangle2.Area();
+}
+
+
+int main() {
+    Rectangle rectangle1(3,6);
+    Rectangle rectangle2(5,6);
+
+    cout<<isEqual(rectangle1,rectangle2);
+}
+```
+
+
+
+### 银行存取款
+
+定义存款取款
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class BankAccount {
+private:
+    int balance;
+public:
+    BankAccount(int b) : balance(b) {}
+
+    BankAccount() {}
+
+    friend int deposit(BankAccount &bankAccount, int num);//存款
+    friend int withdraw(BankAccount &bankAccount, int num);//取款
+};
+
+int deposit(BankAccount &bankAccount, int num) {
+    return bankAccount.balance + num;
+
+}
+
+int withdraw(BankAccount &bankAccount, int num) {
+    if (num > bankAccount.balance) {
+        cout<<"余额不足";
+        return num;
+    } else {
+        return bankAccount.balance - num;
+    }
+}
+
+int main() {
+    int balance;
+    cout << "您的账户余额：";
+    cin >> balance;
+    BankAccount bankAccount = BankAccount(balance);
+    cout << "存款：";
+    cin >> balance;
+    cout << deposit(bankAccount, balance) << endl;
+    cout << "取款：";
+    cin >> balance;
+    cout << withdraw(bankAccount, balance);
+
+}
+```
+
+
+
+### 计算坐标系两点坐标距离
+
+两点坐标，计算两点之间距离
+
+```c++
+#include <valarray>
+#include "iostream"
+
+using namespace std;
+int diff(int num1, int num2);
+
+class Point{
+private:
+    int x,y;
+public:
+    Point(int x,int y):x(x),y(y){}
+    Point(){}
+
+    friend double distance(Point &p1,Point &p2);
+};
+
+double distance(Point &p1,Point &p2){
+    int xlength,ylength;
+    xlength = diff(p1.x,p2.x);
+    ylength = diff(p1.y,p2.y);
+    return sqrt(pow(xlength,2)+pow(ylength,2));
+}
+
+int diff(int num1, int num2) {
+    if (num1 > num2) {
+        return num1 - num2;
+    } else {
+        return num2 - num1;
+    }
+}
+
+int main() {
+    int x,y;
+
+    cout<<"输入第一个点坐标(x,y)：";
+    cin>>x>>y;
+    Point point1 = Point(x,y);
+    cout<<"输入第二个点坐标(x,y)：";
+    cin>>x>>y;
+    Point point2 = Point(x,y);
+
+    cout<<"两点距离为："<<distance(point1,point2);
+}
+
+```
+
+
+
+
 
