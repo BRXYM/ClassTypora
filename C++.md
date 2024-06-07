@@ -29,6 +29,8 @@ C++是一个**面向对象编程**的语言
 
 标准输出流对象cout
 
+cout数据先出送到缓冲区，然后到控制台
+
 ```cpp
 cout<<表达式<<表达式;
 cout<<"Hello\n";
@@ -49,7 +51,11 @@ cin>>a>>b;
 
 
 
-### 变量
+cerr
+
+数据不经过缓冲出，直接输送到控制台
+
+### 变量的定义
 
 ```c++
     int x = 10;//定义一个局部变量
@@ -92,7 +98,7 @@ int main(){
 
 
 
-### 类型转换
+### 强制类型转换
 
 ```c++
     int x = 4, y, z;
@@ -110,7 +116,7 @@ int main(){
 
 
 
-### 内存空间的申请和释放
+### 动态内存空间的分配和释放
 
 ```c++
    	int *p;
@@ -321,7 +327,9 @@ int main(){
 
 
 
-### 内联函数
+### C++语言中的心特性
+
+#### 内联函数
 
 提高程序的运行效率
 
@@ -346,7 +354,7 @@ int main() {
 
 
 
-### 参数带默认值的函数
+#### 参数带默认值的函数
 
 ```c++
 #include "iostream"
@@ -363,7 +371,7 @@ int main(){
 
 
 
-### 函数重载
+#### 函数重载
 
 ```c++
 #include "bits/stdc++.h"
@@ -408,7 +416,7 @@ int main() {
 
 
 
-### 函数模板
+#### 函数模板
 
 ```c++
 #include "bits/stdc++.h"
@@ -443,7 +451,9 @@ int main() {
 
 主函数中，只能调用类中**共有成员**
 
-### 创建类与对象
+### 类
+
+#### 创建类与对象
 
 ```c++
 #include "iostream"
@@ -483,7 +493,7 @@ int main() {
 - 在方法中实例
 - 在类后创建
 
-### this指针的使用
+#### this指针的使用
 
 指向当前对象的指针使用方式
 
@@ -527,7 +537,7 @@ int main() {
 
 
 
-### 内联函数和构造函数
+#### 内联函数和构造函数
 
 ```c++
 #include "iostream"
@@ -592,7 +602,7 @@ int main() {
 
 
 
-### 外联函数
+#### 外联函数
 
 ```c++
 #include "iostream"
@@ -628,7 +638,7 @@ int main(){
 
 
 
-### 格式化
+#### 格式化
 
 ```c++
 #include "bits/stdc++.h"
@@ -658,7 +668,9 @@ int main() {
 
 
 
-### 对象数组
+### 对象
+
+#### 对象数组
 
 数组传入参数的两种方式
 
@@ -727,7 +739,7 @@ int main() {
 
 
 
-### 对象数组键盘赋值
+#### 对象数组键盘赋值
 
 ```c++
 #include <iostream>
@@ -773,9 +785,9 @@ int main() {
 
 
 
-### 数据成员初始化
+#### 数据成员初始化
 
-#### 构造函数初始化方式一
+##### 构造函数初始化方式一
 
 ```c++
 Animal(string name, string type, int age) {
@@ -785,13 +797,13 @@ Animal(string name, string type, int age) {
 }
 ```
 
-#### 构造函数初始化方法二
+##### 构造函数初始化方法二
 
 ```c++
 Animal(string n,string t,int a):name(n),type(t),age(a){}
 ```
 
-#### 构造函数初始化方法三
+##### 构造函数初始化方法三
 
 ```c++
 Animal(string name,string t,int a):name(name),type(t),age(a){}
@@ -899,7 +911,7 @@ int main() {
  * 析构函数的释放顺序是栈规则，先进后出，后进先出
    
 
-### 含有对象成员的构造函数及析构函数
+#### 含有对象成员的构造函数及析构函数
 
 ```
 #include "iostream"
@@ -1069,7 +1081,7 @@ int main() {
 
 
 
-### 指针变量
+### 指针
 
 #### 指向数据成员的指针变量
 
@@ -1463,7 +1475,7 @@ int main() {
 
 
 
-### 公有继承
+#### 公有继承
 
 - 父类中的私有（**private**）成员变量**无法继承**
 - 父类中继承的成员的**权限保持不变**
@@ -1509,7 +1521,7 @@ int main() {
 
 
 
-### 受保护继承
+#### 受保护继承
 
 ```c++
 #include "iostream"
@@ -1550,7 +1562,7 @@ int main() {
 
 
 
-### 私有继承
+#### 私有继承
 
 ```c++
 #include "iostream"
@@ -1597,7 +1609,7 @@ int main() {
 
 
 
-### 构造函数初始化
+#### 构造函数初始化
 
 ```c++
 #include <iostream>
@@ -1705,9 +1717,7 @@ int main() {
 
 
 
-
-
-### 析构函数初始化
+#### 析构函数初始化
 
 ```c++
 #include <iostream>
@@ -1760,6 +1770,1120 @@ int main() {
 }
 ```
 
+#### 含有对象成员的构造函数
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Score {
+private:
+    unsigned chi, math, eng;
+public:
+    Score(unsigned chi, unsigned math, unsigned eng) : chi(chi), math(math), eng(eng) {}
+
+    Score() {}
+
+    void show() {
+        cout << "各科成绩为：" << chi << "," << math << "," << eng << endl;
+    }
+};
+
+class Student {
+private:
+    string name;
+    int sno;
+public:
+    Student(string n, int s) : name(n), sno(s) {}
+
+    Student() {}
+
+    void show() {
+        cout << "姓名：" << name << "学号：" << sno;
+    }
+
+};
+
+class UniversityStu : public Student {
+private:
+    string dept;//系
+    Score score;//创建对象成员
+public:
+    //定义构造函数
+    //父类狗在函数参数列表，对象成员构造函数参数列表，子类参数列表
+    UniversityStu(string name, int no,unsigned c,unsigned m,unsigned e, string dept)
+    : Student(name, no),score(c,m,e), dept(dept) {
+
+    }
+
+    UniversityStu() {}
+
+    //定义函数show，输出大学生所有信息
+    void show() {
+        Student::show();
+        cout << "所在系：" << dept << endl;
+    }
+
+};
+
+
+int main() {
+    UniversityStu universityStu("胡桃",1,88,66,65,"计算机");
+    universityStu.show();
+}
+
+```
+
+
+
+#### 带默认值的构造函数
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Vehicle{//机动车
+private:
+    int wheel;//轮胎数量
+    string brand;//品牌
+public:
+    //定义构造函数
+    Vehicle(int wheel,string brand):wheel(wheel),brand(brand){}
+    Vehicle(){}
+    //自定义函数show，输出信息
+    void show (){
+        cout<<"轮胎数量："<<wheel<<"品牌："<<brand;
+    }
+};
+//定义子类Car
+//属性：passenger_load 载客人数
+//构造函数的定义
+//自定义函数show，输出信息
+class Car:public Vehicle{
+private:
+    int passenger_load;
+    Vehicle vehicle;
+    //构造函数冒号后面可以有默认值，无顺序，默认值随意，最终取默认值
+    //此时，冒号左侧对应的参数省略
+public:
+//    Car(int wheel,string brand,int passenger_load):vehicle(wheel,brand),passenger_load(passenger_load){}
+    Car(int wheel,string brand,int passenger_load):vehicle(4,brand),passenger_load(passenger_load){}
+    Car(){}
+    void show(){
+        vehicle.show();
+        cout<<"，载客人数："<<passenger_load;
+    }
+};
+
+
+
+int main() {
+    //创建对象，输出车辆所有信息
+    Car car(4,"璃月科技",4);
+    car.show();
+}
+```
+
+
+
+### 多继承
+
+2024年5月6日
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Teacher {
+protected://本类及后代
+    string name;
+    string title;//职称
+public:
+    Teacher(string name, string title) : name(name), title(title) {}
+
+    Teacher() {}
+
+};
+
+class Student {
+protected://本类及后代
+    string name;
+    int sno;
+public:
+    Student(string name, int sno) : name(name), sno(sno) {}
+
+    Student() {}
+
+};
+
+class Postgraduate : public Teacher, public Student {//多继承
+private:
+    double salary;
+public:
+    Postgraduate() {}
+
+    //构造函数(参数):父类1(参数),父类2(参数)...
+
+    Postgraduate(string name, string title, int sno, double salary) : Teacher(name, title), Student(name, sno),
+                                                                      salary(salary) {}
+
+    void show() {
+        cout << "姓名:" << Teacher::name << ",职务:" << title << ",学号" << sno << ",工资:" << salary << endl;
+        //当多个父类有同名属性时，需要添加作用域，避免二义性
+    }
+};
+
+int main() {
+    Postgraduate postgraduate("钟离","语文",101,0);
+    postgraduate.show();
+}
+```
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Sofa {
+protected:
+    string color;
+    string brand;//品牌
+public:
+    void setColorBrand(string c,string b){
+        color = c;
+        brand = b;
+    }
+
+    Sofa() {}
+
+    void show() {
+        cout << "芝士沙发" << endl;
+    }
+};
+
+class Bed {
+protected:
+    string color;
+    string brand;
+public:
+    void setColorBrand(string c,string b){
+        color = c;
+        brand = b;
+    }
+
+    Bed() {}
+
+    void show() {
+        cout << "(～﹃～)~zZ" << endl;
+    }
+};
+
+class SofaBed : public Sofa, public Bed {//多继承
+private:
+    double price;
+public:
+    SofaBed(double price):price(price){}
+
+    void display(){
+        cout<<"品牌:"<<Sofa::brand<<endl;
+        cout<<"颜色:"<<Sofa::color<<endl;
+        cout<<"价格:"<<price<<endl;
+        Sofa::show();//加作用域
+        Bed::show();
+    }
+};
+
+int main() {
+    SofaBed sofaBed(100);
+    sofaBed.Sofa::setColorBrand("绿色","沉歌壶");
+    sofaBed.display();
+}
+```
+
+
+
+### 虚基类
+
+2024年5月10日
+
+- 创建一个对象时，虚基类的构造函数优先于普通父类执行
+- 虚基类构造函数只执行一次
+- 先执行虚基类构造函数，再执行普通父类的构造函数，再执行本类的构造函数
+
+
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class A{
+public:
+    A(){
+        cout<<"A"<<endl;
+    }
+};
+
+
+class B{
+public:
+    B(){
+        cout<<"B"<<endl;
+    }
+};
+
+class C:public B,public virtual A{
+public:
+    C(){
+        cout<<"C"<<endl;
+    }
+};
+
+class D:public B,public virtual A{
+public:
+    D(){
+        cout<<"D"<<endl;
+    }
+};
+
+class E:public C,public virtual D{
+public:
+    E(){
+        cout<<"E"<<endl;
+    }
+};
+
+int main(){
+    A a;//A
+    B b;//B
+    C c;//ABC
+    D d;//ABDBCF
+    E e;//ABCBDF
+}
+```
+
+
+
+### 类模板
+
+类模板为类定义一种模式，使得类中的某些数据成员、某些成员的参数、某些成员函数的返回值，能取任意类型
+
+模板类
+
+C++语言编译系统根据类模板和特定的数据类型来产生一个类，即模板类
+
+对象是类的实例
+
+模板类是类模板的实例
+
+类是对象的模板
+
+
+
+## 第六章 多态性和虚函数
+
+运算符重载赋予运算符多重含义
+
+
+
+**三种多态实现方式**
+
+- 函数重载
+- 运算符重载
+- 虚函数
+
+运算符重载实质是**函数重载**
+
+**五类运算符**
+
+- 类属关系运算符  **.**
+- 成员指针运算符  **.***
+- 作用域运算符  **::**
+- 测试运算符  **sizeof**
+- 三目运算符  **?:**
+
+双目运算符默认只有**一个参数**，为**右侧**，左侧默认**被this引用**
+
+前置运算符**没有参数**
+
+后置单目运算符重载为类成员函数参数有**1个，整形**
+
+
+
+
+
+对象进行操作
+
+
+
+### 运算符重载
+
+2024年5月13日
+
+```c++
+#include "iostream"
+
+using namespace std;
+
+class Complex {//复数类
+private:
+    double real, imag;//实数，虚数
+public:
+    //构造函数初始化数据成员
+    Complex(double real, double imag) : real(real), imag(imag) {}
+
+    Complex() {}//定义无参构造函数
+    //把+运算符重载为类的成员函数
+    Complex operator+(Complex complex) {
+        Complex complex_num;//两个复数加法后的新的复数
+        complex_num.real = this->real + complex.real;//两个复数实数部分相加
+        //this->real：第一个对象的实数部分
+        complex_num.imag = this->imag + complex.imag;//两个复数虚数部分相加
+        return complex_num;
+    }
+    Complex operator-(Complex complex) {
+        Complex complex_num;//两个复数减法后的新的复数
+        complex_num.real = this->real - complex.real;//两个复数实数部分相加
+        //this->real：第一个对象的实数部分
+        complex_num.imag = this->imag - complex.imag;//两个复数虚数部分相加
+        return complex_num;
+    }
+
+    void show() {//输出复数
+        cout << "(" << real << "," << imag << ")" << endl;
+    }
+};
+
+int main() {
+    Complex c1(3, 5), c2(5, 8), c3, c4;
+    c1.show();
+    c2.show();
+    c3 = c1 + c2;//当两个对象进行+运算时，系统会自动调用+运算符重载函数
+    c3.show();
+    c4 = c1 - c2;
+    c4.show();
+}
+```
+
+```c++
+//
+// Created by 26371 on 24-5-13.
+//运算符重载2
+#include "iostream"
+#include <windows.h>
+
+using namespace std;
+
+class Time {
+private:
+    int hour, minute, second;
+public:
+    Time(int h, int m, int s) : hour(h), minute(m), second(s) {}
+
+    Time() {}
+
+    Time operator++() {//定义前置单目运算符++重载函数（重载不变）
+        second++;
+        if (second == 60) {
+            minute++;
+            second = 0;
+            if (minute == 60) {
+                hour++;
+                minute = 0;
+                if(hour==13){
+                    hour = 1;
+                }
+            }
+        }
+        return *this;//取到地址中的值
+    }
+
+    Time operator++(int) {//定义后置单目运算符++重载函数（重载不变）
+        //加一个整形类型参数，形参可以省略
+      Time old = *this;
+      ++(*this);
+      return old;
+    }
+
+    void show(){
+        cout<<hour<<":"<<minute<<":"<<second<<endl;
+    }
+
+
+};
+
+int main() {
+    Time t(12,59,45);
+//    while (true){
+//        Sleep(1000);
+    (++t).show();//当++对象名时，系统会自动调用前置运算符
+    (t++).show();
+//        (t.operator++()).show()等同于上方语句
+//    }
+
+}
+```
+
+```c++
+//
+// Created by 26371 on 24-5-17.
+//运算符重载3
+#include "iostream"
+
+using namespace std;
+
+class Test {
+private:
+    int data;//数值
+public:
+    Test(int data) : data(data) {}//构造函数初始化数据成员
+    //把*运算符重载为类的成员函数，参数可以是普通对象的引用
+    Test() {}
+
+    Test operator*(Test &t1) {
+        Test res;//接收两个对象数值乘积的结果
+        res.data = this->data * t1.data;//两个对象值的成绩
+        //this->data:第一个对象（操作数）的值，此处可省略this
+        return res;
+    }
+
+    Test operator/(Test &t1) {
+        Test res;
+        res.data = this->data / t1.data;
+        return res;
+    }
+
+    Test operator%(Test &t1) {
+        Test res;
+        res.data = this->data % t1.data;
+        return res;
+    }
+
+    void show() {
+        cout << data << endl;
+    }
+};
+
+int main() {
+    Test t1(17), t2(8), t3;
+//    t3=t1*t2;当两个对象进行乘法运算时，系统会自动调用*运算符重载函数
+    t3 = t1.operator*(t2);
+    t3.show();
+
+    t3 = t1.operator/(t2);
+    t3.show();
+
+    t3 = t1.operator%(t2);
+
+    t3.show();
+}
+```
+
+```c++
+//
+// Created by 26371 on 24-5-17.
+//运算符重载4
+#include "iostream"
+
+using namespace std;
+
+class Test {
+private:
+    int data;//数值
+public:
+    Test(int data) : data(data) {}//构造函数初始化数据成员
+    //把*运算符重载为类的成员函数，参数可以是普通对象的引用
+    Test() {}
+
+    //友元函数内不存在this指针，所以参数要有两个
+    friend Test operator*(Test &t1, Test &t2);//友元函数类内声明
+
+    friend Test operator/(Test &t1, Test &t2);
+
+    friend Test operator%(Test &t1, Test &t2);
+
+    void show() {
+        cout << data << endl;
+    }
+};
+
+Test operator*(Test &t1, Test &t2) {
+    Test res;//接收两个对象数值乘积的结果
+    res.data = t1.data * t2.data;//两个对象值的成绩
+    return res;
+}
+
+Test operator/(Test &t1, Test &t2) {
+    Test res;
+    res.data = t1.data / t2.data;
+    return res;
+}
+
+Test operator%(Test &t1, Test &t2) {
+    Test res;
+    res.data = t1.data % t2.data;
+    return res;
+}
+
+int main() {
+    Test t1(17), t2(8), t3;
+//    t3=t1*t2;当两个对象进行乘法运算时，系统会自动调用*运算符重载函数
+    t3 = operator*(t1,t2);
+    t3.show();
+    t3 = operator/(t1,t2);
+    t3.show();
+    t3 = operator%(t1,t2);
+    t3.show();
+}
+```
+
+### 虚函数
+
+虚函数定义
+
+虚函数的目的是为了实现子孙的重写，目的是实现多态性
+
+```c++
+//
+// Created by 26371 on 24-5-17.
+//虚函数1
+#include"iostream"
+
+using namespace std;
+
+class Animal {
+public:
+    virtual void eat() {
+        cout << "库库炫" << endl;
+    }
+
+    virtual void cry() {
+        cout << "嗷嗷哭" << endl;
+    }
+
+    void sleep() {
+        cout << "overzzz" << endl;
+    }
+};
+
+class Cat : public Animal {
+public:
+    void eat() {
+        cout << "库库炫鱼" << endl;
+    }
+
+    void cry() {
+        cout << "喵喵喵" << endl;
+    }
+
+    void sleep() {
+        cout << "喵z喵z喵z" << endl;
+    }
+};
+
+class Dog : public Animal {
+public:
+    void eat() {
+        cout << "库库炫肉" << endl;
+    }
+
+    void cry() {
+        cout << "汪汪汪" << endl;
+    }
+};
+
+int main() {
+    Animal a;//创建父类对象
+    a.eat();
+    a.cry();//调用父类自己的函数
+
+    Cat c;//创建子类对象
+    c.eat();
+    c.cry();//调用子类自己的函数
+
+    Dog d;
+    d.eat();
+    d.cry();
+
+    Animal *t;//创建指向对象的指针变量，即只针对想
+    t->eat();
+    t = &a;
+
+    t = &c;//把子类对象赋值给父类，t（可以理解为上转型对象）可以调用子类中重写或继承的成员，但不能子类新增加的成员
+    t->eat();//调用子类cat中重写的函数
+    t->f();//调用子类cat继承的函数
+    t=&d();
+    t->cry();//调用子类dog中重写的函数
+
+    Animal *s = new Animal;//创建只只针对象
+    s->cry();
+    s->eat();
+
+    s = new Dog;//把子类对象赋值给父类
+
+    s= new Cat;//把子类赋值给父类
+
+    //父类中方法若想被子类重写，必须在父类函数中加virtual（虚函数）
+    //子类重写父类函数时，默认时虚函数，可省略virtual，建议显示的写出virtual
+}
+```
+
+
+
+### 纯虚函数和抽象类
+
+纯虚函数是一种特殊的虚函数，在声明”初始化“时为0的函数，
+
+
+
+- 纯虚函数没有函数体
+- 纯虚函数什么语句最后面的
+- 纯虚函数声明语句最后应有分号
+- 纯虚函数只有函数的名字，没有功能，不能被调用，将在派生类定义
+- 多态性
+- 继承过来的虚函数还是虚函数
+- 只有类中才能声明纯虚函数
+
+
+
+```c++
+/*
+大连交通大学
+2024-05-20 11:28
+author:马延旭
+title:纯虚函数1
+*/
+#include "iostream"
+
+using namespace std;
+
+const double PI = 3.14; // 常量
+class Point             // 包含纯虚函数的累成为抽象类
+{
+protected:
+    int x, y;
+
+public:
+    Point(int a, int b) : x(a), y(b) {}
+    Point() {}
+
+    virtual double getArea() = 0; // 纯虚函数，
+
+    virtual void show() = 0; // 纯虚函数，显示信息
+};
+
+class Circle : public Point
+{
+protected:
+    double r;
+
+public:
+    Circle(int a, int b, double ra) : Point(a, b), r(ra) {}
+    virtual double getAtea() // 重写父类方法
+    {
+        return PI * r * r; // PI*pow(r,2)
+    };
+    virtual void show()
+    {
+        cout << "圆心坐标:(" << x << "," << y << ")" << endl;
+        cout << "圆的面积：" << getArea() << endl;
+    }
+};
+
+class Cylinder : public Circle
+{
+private:
+    double h;
+
+public:
+    Cylinder(int a, int b, double ra, double h) : Circle(a, b, ra), h(h) {}
+    virtual double getArea()
+    { // 重写父类Circel方法
+        return 2 * PI * r * h;
+    }
+    double getVolume()
+    {                                 // 柱体体积
+        return Circle::getArea() * h; // 以圆为底
+    }
+    virtual void show()
+    {
+        cout << "圆柱侧面积:(" << getArea() << ")" << endl;
+        cout << "圆柱体体积：" << getVolume() << endl;
+    }
+};
+
+int main()
+{
+    // Point p;错误，不能对抽象类创建对象，不能实例化抽象类
+    //Point *p = new Circle(3, 6, 2.5); // 把子类创建对象的引用赋值给父类指针
+    Point *p;
+    p->show();
+
+    p = new Cylinder(1, 2, 3, 4);
+    p->show();
+}
+
+```
+
+```c++
+/*
+大连交通大学
+2024-05-20 11:15
+author:马延旭
+title:虚函数2
+*/
+#include <iostream>
+
+using namespace std;
+
+class Animal
+{
+public:
+    // 定义纯虚函数
+    virtual void cry() = 0;
+    virtual void eat() = 0;
+};
+
+class Cat : public Animal
+{
+public:
+    virtual void cry()
+    {
+        cout << "喵喵喵" << endl;
+    }
+    virtual void eat()
+    {
+        cout << "炫鱼" << endl;
+    }
+};
+
+class Dog : public Animal
+{
+public:
+    virtual void cry()
+    {
+        cout << "汪汪汪" << endl;
+    }
+    virtual void eat()
+    {
+        cout << "炫肉" << endl;
+    }
+};
+
+void f1(Animal *t)//参数是抽象类的指针变量
+//根据不同实体调用相应重写的方法
+{
+    t->cry();
+    t->eat();
+}
+
+void f2(Animal &a)//参数是抽象类的对象的引用
+//根据不同实体调用相应重写的方法
+{
+    a.cry();
+    a.eat();
+}
+int main()
+{
+    Cat c;
+    Dog d;
+    f1(&c);//调用方法f1，传参是对象的地址
+    f2(c);//调用方法f2，传参是对象
+
+    f1(&d);
+    f2(d);
+    return 0;
+}
+
+/*
+ * 虚函数实现多态性：
+ * 满足的条件
+ * 1.一定是在继承的环境中
+ * 2.子类重写父类虚函数
+ * 实现是方式
+ * 1.用父类的指针变量或对象的引用去调用子类重写的方法
+ */
+```
+
+
+
+
+
+#### 抽象类
+
+凡是包含纯虚函数的类都是抽象类
+
+如果在子类中，没有重写所有父类中的抽象类，子类也还是抽象类
+
+如果全部实现，子类不算抽象类
+
+抽象类无法实例化，但是可以定义指针变量，通过指针调用子类，实现多态性能
+
+
+
+### 虚析构函数
+
+构造函数不能构造成虚函数
+
+对析构函数构造成虚函数
+
+如果一类的**析构函数**是**虚函数**的话，继承他的派生类，**所以子类**的**析构函数**都是**虚函数**
+
+析构函数设置为虚函数后，使用**指针**引用可以**动态绑定**
+
+作用：使用基类类型的指针能够调用适当的虚构函数释放不同对象的内存
+
+**无故声明虚析构函数**和**永远不声明虚析构函数**都是**错误**的
+
+父类中如果定义了一个虚函数的情况下，建议子类定义虚析构函数
+
+由于使用了虚析构函数实现了多态性，使得子类的析构函数调用，子类对象申请的动态空间实现了释放
+
+```c++
+/*
+大连交通大学
+2024-05-24 08:27
+author:马延旭
+title:虚析构函数
+*/
+#include <iostream>
+
+using namespace std;
+//自底向上去释放空间
+
+class Father {
+public:
+    virtual ~Father() {//定义虚析构函数（不能重载）
+        cout << "father" << endl;
+    }
+};
+
+class Son : public Father {
+private:
+    int *p;//定义整型类型指针变量
+public:
+    Son() {
+//        p = new int;为指针申请空间，系统提供默认int型值
+        p = new int(12);//为指针申请空间并初始化
+    }
+
+    ~Son() {
+        cout << "son" << endl;
+        delete p;//释放指针空间
+    }
+};
+
+void test(Father *t) {//参数是父类的指针变量
+    delete t;//释放空间，系统自动析构函数
+
+};
+
+int main() {
+//    Father *s = new Son();//父类指针只想子类空间
+//    test(s);
+    Father f;
+    Son s;//创建子类对象
+    test(&s);//子类的地址
+
+}
+```
+
+
+
+## C++的流类库与输入输出
+
+### 重载输入输出
+
+系统提供istream与ostream，cin和cout分别是istream和ostream的对象
+
+```c++
+//
+// Created by 26371 on 24-5-27.
+//输入输出流运算符重载函数1
+#include "iostream"
+
+using namespace std;
+
+class Point {
+private:
+    int x, y;
+public:
+    //输入流运算符>>重载为类的非成员函数（友元函数）
+    friend istream &operator>>(istream &in, Point &p);
+
+    //输出流运算符<<重载为类的非成员函数（友元函数）
+    friend ostream &operator<<(ostream &out, Point &p);
+};
+
+//输入流运算符重载函数的实现
+istream &operator>>(istream &in, Point &p) {
+    in >> p.x >> p.y;//从键盘为对象x，y赋值
+    return in;//返回输入流对象
+}
+
+//输出流运算符重载函数的实现
+ostream &operator<<(ostream &out, Point &p) {
+    out << "(" << p.x << "," << p.y << ")\n";//输出坐标
+    return out;//返回输出流对象
+}
+
+
+int main() {
+    Point p1, p2;
+    cout<<"请输入第一个对象的坐标：\n";
+    cin>>p1;//当>>后面连接对象名时系统自动调用
+    //输入流运算符重载函数
+    cout<<"p1="<<p1;//当<<后面链接对象名时系统自动调用
+    //自动调用输出流运算符重载函数
+
+
+}
+```
+
+### 文件的输入输出
+
+P266
+
+filename：指要打开的文件
+
+mode：指打开文件的方式
+
+access：指打开文件的属性
+
+发开文件的方式在类ios中定义，常用值如下
+
+ios:in文件输入方式打开（文件数据输入到内存）
+
+ios:out文件输出方式打开（内存数据输入到文件）
+
+0是默认值
+
+1是只读文件
+
+2是隐含文件
+
+4是系统文件
+
+#### 文件的读取
+
+从文件读取时，若文件不存在，会出错，需要事先创建文件
+
+```c++
+//
+// Created by 26371 on 24-5-27.
+//文件的读取
+#include "iostream"
+#include "fstream"//加载头文件
+using namespace std;
+void readFile(){
+    //2-创建读取文件流对象
+    ifstream ifs;//fstream子类
+    //3-打开文件（判断是否成功打开）
+    ifs.open("../data.txt",ios::in);
+    if (ifs.is_open()){
+        cout<<"打开文件成功"<<endl;
+    }else{
+        cout<<"打开文件失败"<<endl;
+    }
+    //4-读取文件内容（有四种方法）
+    //1.单个字符读取，存放到字符数组中
+    char a[1024];
+    while (ifs>>a){//读一个字符，存入a数组中
+        cout<<a<<endl;//不会自动换行，把空格及回车符当分隔符，才换行
+    }
+    
+    //2.按行读取，存档在字符数据中
+    char a[200];
+    while (ifs.getline(a,200)){//参数：存档到数组中，读取个数
+        cout<<a<<endl;//不会自动换行需要手动换行
+    }
+    
+    //3.按单个字符读取，用get方法读取，一次读取一个字符
+    char c;
+    while ((c = ifs.get()) != EOF) {//EOF：end of file到达文件末尾
+        cout << c;//会自动换行
+    }
+    
+    //4.按行读取，存放在字符串中
+    string s;
+    while(getline(ifs,s)){//参数：from(文件来源)，to(存到哪里)
+        cout<<s<<endl;//不会自动换行，需要手动换行
+    }
+
+    //5-关闭文件流对象
+};
+
+//自定义函数用于读取文件
+int main(){
+    readFile();
+}
+```
+
+乱码解决：更改保存文件的文件编码
+
+
+
+#### 文件的写入
+
+当文件写入数据时，若文件不存在，系统会自动创建
+
+```c++
+//
+// Created by 26371 on 24-5-31.
+//文件的写入
+#include "iostream"
+#include "fstream"//1-记载头文件
+
+using namespace std;
+
+void writeFile() {
+//    2.创建文件写入流对象
+    ofstream ofs;
+//    3.打开文件
+    ofs.open("data.txt", ios::out|ios::app);//参数：路径，打开方式“可写入”ios::app续写文件
+//    4.写入数据
+    ofs << "109,穹,67,女,17,535353453\n";
+    ofs << "108,卡夫卡,90,女,90,534535\n";
+    ofs << "107,温迪,30,男,79,353453\n";
+    ofs << "106,神里凌华,60,女,26,45353453\n";
+    ofs << "105,心海\t,100,女,28,535353\n";
+    char a[] = "（￣︶￣）\n";
+    string s = "(～﹃～)~zZ";
+
+    ofs.write(a, sizeof(a));//将字符数组a整体写入文件
+
+//    for (int i = 0; i < sizeof(a); ++i) {
+//        ofs.put(a[i]);//把数组中每个字符写入到文件中
+//    }
+//    for (int i = 0; i < size(s); ++i) {
+//        ofs.put(s[i]);
+//    }
+
+}
+
+int main() {
+    writeFile();
+}
+```
+
+
+
+### 习题
+
+1.头文件iostream中定义了4个标准流对象，分别是**cin**（标准输入流对象），**cout**（标准输出流对象），**cerr**（标准错误流对象），**clog**（标准日志流对象）。
+2.用标准输入流对象cin与提取操作符>>连用进行输入时，可以使用**setf函数**来设置输入流的格式状态，并可以使用unsetf函数来取消某种格式状态。
+3.每一个输入流对象都有一个**flags**成员函数来控制流的格式的方法。
+4.C++提供了使用getline函数和get函数来读入数据；文件输出则可以使用put函数和putline函数来实现。
+5.文件输入和文件输出都需要使用文件对象，通过open函数打开文件，通过close函数关闭文件。
+6.文本文件是存储ASCII码字符的文件，文本文件的输入可以使用ifstream对象的getline函数和get函数来实现。文本文件的输出可以使用ofstream对象的put函数和putline函数来实现。在处理文本文件时，需要注意的是，文件的输入输出可能需要进行字符的转换，例如在Windows系统中，文件的换行符是"\r\n"，而在Unix系统中，文件的换行符是"\n"，如果在不同系统间传输文件，可能需要进行换行符的转换。
+
+
+
+
+
 
 
 ## 练习
@@ -1800,6 +2924,8 @@ int main() {
     cout<<isEqual(rectangle1,rectangle2);
 }
 ```
+
+
 
 
 
@@ -1904,6 +3030,74 @@ int main() {
     cout<<"两点距离为："<<distance(point1,point2);
 }
 
+```
+
+### 虚函数练习
+
+创建一个基类Person，包含属性name和age，以及一个虚函数displayInfo()用于显示个人信息。从Person类派生出Student和Teacher类，分别添加额外的属性（如学生的学号和老师的职称），并重写dislayInfo()函数以显示学生和老师的信息。
+
+```c++
+#include<iostream>
+
+using namespace std;
+
+class Person {
+protected:
+    string name;
+    int age;
+
+public:
+
+    Person(string name, int age) {
+        this->name = name;
+        this->age = age;
+    }
+
+    virtual void displayInfo() {
+        cout << "姓名:" << name << ", 年龄:" << age << endl;
+    }
+};
+
+class Student : public Person {
+public:
+    int id;
+
+    Student(string name, int age, int id) : Person(name, age), id(id) {}
+
+    virtual void displayInfo() {
+        cout << "姓名:" << name << ", 年龄:" << age << ", 学号:" << id << endl;
+    }
+};
+
+class Teacher : public Person {
+protected:
+    string title;
+public:
+
+    Teacher(string name, int age, string title) : Person(name, age), title(title) {}
+
+    virtual void displayInfo() {
+        cout << "姓名:" << name << ", 年龄:" << age << ", 职称:" << title << endl;
+    }
+};
+
+int main() {
+    Person p("一月", 30);
+    p.displayInfo();
+
+    Student s("二月", 20, 100);
+    s.displayInfo();
+
+    Teacher t("三月", 35, "C++老师");
+    t.displayInfo();
+
+    Student d("一月",20,1);
+    s.displayInfo();
+
+    Person *f = new Student("二月",22,2);
+    f->displayInfo();
+
+}
 ```
 
 
