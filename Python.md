@@ -328,6 +328,8 @@ a=4 b=4 c=2
 
 ### 位运算符
 
+**不考**
+
 位运算符是在二进制或二进制数的基础上进行的运算。
 
 - &（按位与）
@@ -1105,7 +1107,7 @@ if __name__=='__main__':
 # 判断是否为主程序。如果运行当前文件，则执行；若当作模块被引用，则不执行。
 ```
 
-### 参数传递顺序
+### 参数传递
 
 #### 位置传参
 
@@ -1175,22 +1177,343 @@ dict2={'name':"zhang",'age':30}
 fun2(**dict2) # 调用时，字典前加两个*，解包后传递
 ```
 
+### 函数返回值
 
+return语句返回多个值
 
+```python
+return 语句返回多个值
+def 函数(参数):
+  函数体
+  return 返回值1，return 返回值2...
+```
 
+返回多个值以元组类型保存
 
+练习：计算一组的奇数和，偶数和
 
+输入一个整数，输出：1~整数 的奇数和，偶数和 ,总合
 
+```python
 
+def getsum(num):
+   """
+   这个函数用于计算从1到给定数字的所有偶数和奇数的和，以及它们的总和。
 
+   参数:
+   num: 一个整数，表示要计算的范围的上限。
 
+   返回值:
+   一个元组，包含三个元素：
+   s1: 从1到给定数字的所有偶数的和
+   s2: 从1到给定数字的所有奇数的和
+   s: s1和s2的和
+   """
+   # 初始化三个和为0的变量
+   s = 0
+   s1 = 0
+   s2 = 0
+   # 遍历从1到给定数字的所有整数
+   for i in range(1,num+1):
+       # 如果整数是偶数，加到s1上
+       if(i%2==0):
+           s1 += i
+       # 如果整数是奇数，加到s2上
+       if(i%2!=0):
+           s2 += i
+       # 更新总和
+       s = s1+s2;
+   # 返回三个和
+   return (s1,s2,s)
 
+# 调用函数，并打印结果和结果的类型
+result = getsum(10)
+print(result,type(result))
 
+# 解包赋值:一个数据结构的元素解开并赋值给变量的操作
+a,b,c=getsum(20)
+# 列表解包
+a,b,c=[10,20,40]
+# 字典解包：解包键
+a,b,c={'a':1,'b':2,'c':3}.keys()
+print(a)
+print(b)
+print(c)
+# 解包值
+a,b,c={'a':1,'b':2,'c':3}.values()
+# 解包键值对象
+a,b,c={'a':1,'b':2,'c':3}.items()
+print(a)
+print(b)
+print(c)
+# 变量=元素数
+```
 
+### 变量的作用域
 
+#### 局部变量
+
+函数定义的形参和函数内部定义的变量
+
+作用域：函数内部，函数结束，局部变量的生命周期结束
+
+#### 全局变量
+
+函数外定义的变量，活着用global关键字修饰的变量
+
+作用域：整个程序，程序结束，全局变量的生命周期也结束
+
+```python
+c=100
+def cal(a,b):
+    global c
+    c=200
+    s=a+b+c
+    return s
+result=cal(2,4)
+print(200)
+print(result)
+```
+
+### 递归函数
+
+练习
+
+```python
+1！=1 2！=1！*2 3！=2！*3 4！=3！*4 ... N!=(N-1)!*N
+def fact(n):
+    if n == 1:
+        return 1
+    return fact(n-1)*n
+
+# 调用
+result = fact(4)
+print(result)
+```
+
+### 匿名函数
+
+适用于，返回表达式的函数
+
+```python
+# 定义一个lambda函数s，接受两个参数a和b，返回它们的和
+s = lambda a,b:a+b  # s 是 function 类型，a,b是参数，a+b是返回值。
+# 打印s的类型和s(10,20)的结果，用于验证lambda函数s的正确性
+print(type(s),s(10,20))
+# 相当于普通函数：
+def s(a,b):
+    return a+b
+print(s(10,30))
+```
+
+排序
+
+```python
+scores = [
+    {'name':'张三','score':100},
+    {'name':'李四','score':90},
+    {'name':'王五','score':80},
+    {'name':'赵六','score':70},
+    {'name':'孙七','score':60},
+]
+```
+
+对成绩进行降序排序
+
+列表.sort() 列表对象的排序 ， 列表改变  sorted(可迭代的类型):内置函数 ，返回新对象。scores列表对象会把列表的每个字典元素传递给x，返回的是每个字典的成绩值。成绩值作为排序的key。scores.sort(key=lambda x:x['score'])  x.get('score') : 获取字典score的值。
+
+```python
+scores.sort(key=lambda x:x['score'],reverse=True)
+print(scores)
+```
 
 ## 第六章 文件操作
 
+### 文件的创建
+
+用于打开文件，返回一个文件对象
+
+无法打开文件，返回OSError异常，通用异常，表示操作系统相关的错误
+
+```python
+open(file,mode='r',encoding=None)
+```
+
+第一个参数file是必须的，它指定了要打开的文件的名称
+
+```python 
+"D:\\file"
+```
+
+第二个参数mode是可选的，他指定了打开文件的模式
+
+- r 读取 默认
+- w 写入 创建或覆盖文件内容
+- a 追加 追加文件末尾，不存在则创建文件
+
+第三个参数是可选的，它指定了文件的编码格式
+
+练习：读取file.txt内容
+
+创建文件对象
+
+```python
+file_r=open("file.txt",'r')
+str2 = file_r.read()
+print(str2)
+file_r.close()
+```
+
+
+
+相对路径
+
+```python
+file_r3=open("../outfile.txt","r")
+print(file_r3.read())
+```
+
+
+
+### 关闭文件
+
+打开的文件占用系统资源
+
+若程序因异常关闭，产生数据丢失
+
+```python
+文件对象.close()
+```
+
+自动关闭文件
+
+```python
+with open("file.txt", "r") as file_r4:
+    file_r4.read()
+```
+
+
+
+文件操作的三步
+
+- 创建文件
+- 读和写
+- 关闭文件
+
+### 读操作
+
+#### 直接读整个文件
+
+```python
+文件读取.read(字符数)
+```
+
+练习：输出古诗.txt内容
+
+```python
+# 打开名为"古诗.txt"的文件，以只读模式打开，并将文件对象赋值给file_r5
+file_r5=open("古诗.txt","r")
+# 使用with语句打开文件，可以自动关闭文件，减少忘记关闭文件的可能性
+with open("古诗.txt","r") as file3:
+   # 读取文件内容，并将内容赋值给str2
+   str2 = file3.read()
+   # 输出str2的内容，此时文件还未关闭
+   print(str2)  #先输出，在关闭文件
+# 文件已经关闭，再次输出str2的内容
+print(str2) #先关闭文件，在输出
+```
+
+#### 一次读一整行
+
+```python 
+文件对象.readline()
+```
+
+```python
+# 打开名为"古诗.txt"的文件，以只读模式打开
+file4 = open("古诗.txt","r")
+# 读取文件的第一行内容
+str2=file4.readline()
+# 读取文件的第二行内容
+str3=file4.readline()
+# 打印第一行内容
+print(str2)
+# 打印第二行内容
+print(str3)
+```
+
+#### 使用循环读文件
+
+```python
+# 打开名为"古诗.txt"的文件，以只读模式打开
+file4=open("古诗.txt","r")
+# 遍历文件中的每一行
+for line in file4: # line 文件对象的每一行内容。默认调用readline()。
+   # 打印每一行的内容
+   print(line)
+# 关闭文件
+file4.close()
+```
+
+#### 一次性读所有行
+
+```python
+文件对象.readlines()
+```
+
+```python 
+# 打开名为"古诗.txt"的文件，以只读模式打开
+file4=open("古诗.txt","r")
+# 使用rawlines()方法读取文件中的所有行，并将其存储在list2中
+list2=file4.rawlines()
+# 打印list2的内容和其类型
+print(list2,type(list2))
+```
+
+### 目录及写入文件操作
+
+创建目录
+
+os模块：是系统的内置模块，提供了对文件，目录的接口函数
+
+- mkdir()：创建文件目录
+- rkdir()：删除文件目录
+- path.exists()：判断文件或文件夹是否存在
+
+练习：在ts文件夹下根据每个诗人创建一个文件夹，打印诗人名，不考虑重复
+
+```python
+# 打开名为"古诗.txt"的文件，以只读模式打开
+file=open("古诗.txt","r")
+# 遍历file 进行读
+for line in file:
+   # 判断是否是标题行，标题行的前3个字符是数字
+   if line[:3].isdigit():
+       # 获取诗人名，诗人名在"："后面
+       index = line.find("：")
+       name=line[3:index]
+       # 创建诗人名的文件夹，文件夹路径为"ts\\"+name
+       lj="ts\\"+name
+       # 判断这个文件夹是否存在,如果不存在就创建
+       if not os.path.exists(lj):
+           os.mkdir(lj)
+# 关闭文件
+file.close()
+```
+
+
+
+## 第七章 类与对象
+
+**少考**
+
+类是和对象的关系：
+
+类是对象的抽象，对象是类的实例
+
+```python
+pass #空语句
+```
 
 
 
@@ -1198,26 +1521,9 @@ fun2(**dict2) # 调用时，字典前加两个*，解包后传递
 
 
 
+## 第八章 第三方库
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+**不考**
 
 
 
@@ -1540,5 +1846,325 @@ while True:
        break
    else:
        print("无效的选择，请重新输入。")
+```
+
+### 斐波那切数列
+
+1,1,2,3,5,8,13,21,34,55
+
+1 2 3 4 5 6 7 8 9 10
+
+fac(n)=fac(n-1)+fac(n-2)
+
+```python
+def fanbo(n):
+   """
+   这是一个递归函数，用于计算斐波那契数列的第n项。
+
+   参数:
+   n: 要计算的斐波那契数列的项数，是一个大于等于1的整数。
+
+   返回值:
+   返回斐波那契数列的第n项。
+
+   异常描述:
+   如果n不是一个大于等于1的整数，函数可能会抛出异常。
+   """
+   # 如果n等于1或2，则返回1，因为斐波那契数列的前两项都是1
+   if n == 1 or n == 2:
+       return 1
+   # 否则，返回斐波那契数列的第n-1项和第n-2项之和
+   return fanbo(n-1)+fanbo(n-2)  #n变化:递减
+
+# 调用
+print(fanbo(7))
+# 前12项值的和
+sum = 0
+for i in range(1,13):
+   # 累加斐波那契数列的前12项
+   sum+=fanbo(i)
+print(sum)
+```
+
+### 汉塔塔
+
+经过三步
+
+第一步：将(n-1)个盘子  A----->B
+
+第二步：将 最后 的盘子  A----->C
+
+第三步：将(n-1)个盘子  B----->C
+
+```python
+# 定义一个全局变量count，用于记录汉诺塔问题的步数
+count = 0
+
+
+def han(n,a,b,c):
+   """
+   汉诺塔问题的递归解法
+
+   参数:
+   n: 盘子的数量
+   a: 起始柱
+   b: 辅助柱
+   c: 终止柱
+
+   返回值:
+   无返回值，但会更新全局变量count，记录移动步数
+   """
+   # 当只有一个盘子时，直接将盘子从a柱移到c柱，并将步数加一
+   if n==1:
+       print(a,'--->',c)
+       global count
+       count += 1
+   else:
+       # 将n-1个盘子通过辅助柱b，从起始柱a移到辅助柱c
+       han(n-1,a,c,b)
+       # 将最底下的一个盘子从起始柱a移到终止柱c
+       han(1,a,b,c)
+       # 将n-1个盘子通过起始柱a，从辅助柱b移到终止柱c
+       han(n-1,b,a,c)
+
+
+# 如果当前脚本是主程序，则调用han函数，将4个盘子从A柱移到C柱
+if __name__ == "__main__":
+   han(4,'A','B','C')
+   # 输出移动步数
+   print(f"{count}步")
+```
+
+### 编写一个判断两位质数的小数
+
+```python
+def isprime(n):
+   """
+   判断一个数是否为质数
+
+   参数:
+   n : int
+       需要判断的数
+
+   返回:
+   bool
+       如果n是质数，返回True，否则返回False
+   """
+   # 从2开始遍历到n-1
+   for i in range(2,n):
+       # 如果n能被i整除，则n不是质数，返回False
+       if n%i == 0:
+           return False
+   # 如果n不能被2到n-1的任何数整除，则n是质数，返回True
+   return True
+
+
+# 测试10-20之间的质数
+print(isprime(55))
+```
+
+### 100内判断绝对质数
+
+```python
+def rev(num):
+   """
+   功能描述：将输入的数字转换为字符串，然后反转字符串，再将反转后的字符串转换为整数
+   参数：
+   num：需要反转的数字
+   返回值：
+   反转后的整数
+   """
+   # 将输入的数字转换为字符串
+   y = str(num)
+   # 反转字符串
+   y = y[::-1]
+   # 将反转后的字符串转换为整数
+   y = int(y)
+   return y
+# 10-100之间的绝对质数，3个一行
+count = 0
+for i in range(10,100):
+   # 判断i是否为质数
+   if isprime(i) and isprime(rev(i)):
+       print(i,end='    ') # 后面四个空格
+       # 进行质数计数
+       count += 1
+       # 判断是否是3的倍数
+       if count%3 == 0:
+           print()
+```
+
+### 100内的隔阂巴德猜想
+
+```python
+# 定义变量z和items，z用于计数，items用于存储满足条件的数字
+z,items=0,[]
+# 循环遍历从4到99的所有奇数
+for i in range(4,100,2):
+   # 循环遍历从2到99的所有数字
+   for x in range(2,100):
+       # 循环遍历从2到99的所有数字
+       for y in range(2,100):
+           # 判断x和y是否为质数，并且i等于x+y，且i不在items列表中
+           if isprime(x) and isprime(y) and i==x+y and i not in items:
+               # 将满足条件的i添加到items列表中
+               items.append(i)
+               # 打印满足条件的i，以及i的两个因数x和y
+               print("{:2d}={:2d}+{:2d}".format(i,x,y),end="\t")
+               # 计数器z加1
+               z+=1
+               # 如果z是5的倍数，则换行
+               if z%5==0:
+                   print()
+```
+
+### 三边是否构成三角形
+
+```python
+
+def sjx(a,b,c):
+   """
+   判断三边长能否构成三角形，并返回三角形类型
+
+   参数:
+   a,b,c : 三个边长
+
+   返回值:
+   0 : 不能构成三角形
+   1 : 等边三角形
+   2 : 等腰三角形
+   3 : 直角三角形
+   4 : 一般三角形
+   """
+   lx=0
+   # 判断三边长是否能构成三角形
+   if a+b<c and a+c<b and b+c<a:
+       # 判断三边长是否相等
+       if a==b==c:
+           lx=1
+       # 判断是否为等腰或等边三角形
+       elif a==b or a==c or b==c:
+           lx=2
+       # 判断是否为直角三角形
+       elif a**2+b**2==c**2 or a**2+c**2==b**2 or b**2+c**2==a**2:
+           lx=3
+       else:
+           lx=4
+   return lx
+
+# 输入三个边长
+x=eval(input())
+y=eval(input())
+z=eval(input())
+# 判断输入的三个边长能否构成三角形，并打印结果
+m=sjx(x,y,z)
+if m==0:
+   print("不能构成三角形")
+elif m==1:
+   print("等边三角形")
+elif m==2:
+   print("等腰三角形")
+elif m==3:
+   print("直角三角形")
+else:
+   print("一般三角形")
+```
+
+### 计算字符串中大小写字母的数量
+
+```python
+def func(x):
+  """
+  计算输入字符串中大写字母和小写字母的数量
+
+  参数:
+  x: 输入的字符串
+
+  返回值:
+  返回一个元组，第一个元素是大写字母的数量，第二个元素是小写字母的数量
+  """
+  # 初始化大写字母和小写字母的计数器
+  upper_count = 0
+  lower_count = 0
+  # 遍历输入字符串中的每个字符
+  for a in x:
+      # 如果字符是大写字母，大写字母计数器加一
+      if a.isupper():
+          upper_count += 1
+      # 如果字符是小写字母，小写字母计数器加一
+      elif a.islower():
+           lower_count += 1
+      # 如果字符既不是大写字母也不是小写字母，跳过此次循环
+      else:
+           continue
+  # 返回大写字母和小写字母的数量
+  return upper_count,lower_count
+
+if __name__ == '__main__':
+  # 从用户输入获取字符串，并调用func函数计算大写字母和小写字母的数量
+   b = func(input("请输入字符串:"))
+   # 打印结果
+   print(b)
+```
+
+### 商店
+
+```python
+#encoding:utf-8
+# 定义商品和价格的字典
+"""
+商品和价格的字典，键为商品名称，值为商品价格
+"""
+goods={
+       '方便面':4,
+       '奶茶':8,
+       '洗衣粉':20,
+       '矿泉水':4
+}
+# 购物车字典，键为商品名称，值为购买数量
+Cart={}
+# 显示商品：
+def show():
+   """
+   显示所有商品及其价格
+   """
+   # 遍历商品字典，打印商品名称和价格
+   for key,value in goods.items():
+       print(f"{key}:{value}元")
+   print("="*20)
+# 购买商品
+def buy():
+   """
+   购买商品，输入商品名称和购买数量，将商品和数量添加到购物车，计算总消费金额
+   """
+   # 初始化总消费金额为0
+   count = 0
+   while True:
+       # 输入购买的商品名称，如果输入'end'，则退出购买
+       input_in = input("请输入您要购买的东西,输入end退出购买")
+       if input_in == 'end':
+           print("消费总金额为{}".format(count))
+           break
+       # 遍历商品字典，如果输入的商品名称在字典中，则进行购买
+       for key, values in goods.items():
+           if key == input_in:
+               # 输入购买的数量
+               count_num = int(input("请输入您的购买数量"))
+               # 将商品名称和数量添加到购物车
+               Cart[input_in]=count_num
+               # 计算总消费金额
+               count += values * count_num
+       # 打印购物车内容和当前消费金额
+       print("您的购物车里现在有", Cart)
+       print("目前消费金额为{}".format(count))
+def main():
+   """
+   主函数，显示商品和购买商品
+   """
+   show()
+   buy()
+if __name__== '__main__':
+   # 如果是主模块，则执行主函数
+   main()
 ```
 
