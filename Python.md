@@ -113,13 +113,34 @@ print(name,age,sex,address)
 
 ##### 列表
 
+列表的操作
+
+- list.append(x)：末尾添加元素x
+- list.extend(l)：在列表末尾加入指定列表L的所有数据
+- list.insert(0,x)：给指定位置插入元素，即在位置i插入x，其余元素一次向后退
+- list.remove(x)：删除列表中第一个值为x的元素，若该元素不存在则出错
+- list.pop([i])：删除列表中给定位置i处的元素，并返回该元素。不指定索引值返回最后一个元素
+- list.clear()：删除列表中的所有元素，等价于del a[:]
+- list.index()：返回列表中值为x的元素位置多有，不存在则出错
+- list.count(x)：返回x在列表中出现的次数
+- list.sort(key = None,reverse = False)：对列表中的元素排序，默认为升序
+- list.reverse()：将列表中的元素的顺序反转
+- list.copy()：返回列表的浅复制
+  - 浅复制可以理解为一个指向列表的新的指针，类似于别名
+
 ##### 元组
 
-
+- len(t)：返回元组的长度
+- t + (6 , 7)：连接两个元组
+- t * 3：复制元组
+- 2 in t：检查元组中是否包含某个元素
+- for i in t：遍历元组中的元素
 
 #### 集合类型
 
 ##### 集合
+
+集合里面只能放元组
 
 ##### frozenset
 
@@ -552,14 +573,14 @@ for 循环变量 in 目标对象:
 
 频繁修改场景
 
-#### 创建列表：[]
+#### 创建列表
 
 ```python
 list = [1,3,5,"rr"]
 print(list)
 ```
 
-#### 创建列表：函数list()
+#### 函数list()
 
 ```python 
 list2 = list()#空列表
@@ -802,8 +823,6 @@ print(score)
 
 ```
 
-
-
 ### 元组
 
 不可改变数据类型，无法添加元素
@@ -832,12 +851,57 @@ print(tuple7)
 
 #### 元组的操作
 
+##### 索引
+
+```python
+元组[i]
+```
+
 ##### 切片
+
+**重点**
 
 ```python
 x=(1,2,4,6,8,9)
 print(x[2:4])
 ```
+
+##### 连接
+
+```python
+元组1 + 元组2
+```
+
+##### 复制
+
+将元组复制i次
+
+```python
+元组 * i 
+i * 元组
+```
+
+##### 求长度
+
+```python
+len(元组)
+```
+
+##### 对元组元组循环
+
+```python
+
+```
+
+##### 查找元组中元素
+
+返回值为布尔类型
+
+##### 删除元组
+
+##### 返回最大值
+
+##### 返回最小值
 
 ### 字典
 
@@ -933,6 +997,18 @@ for key,value in dict2.items():
     print(f"{key}:{value}")
 ```
 
+##### 其他操作
+
+- dict.keys()：返回包含字典所有key的列表
+- dict.values()：返回包含字典所有value的列表
+- dict.items()：返回包含所有（键，值）项的列表
+- dict.clear()：删除字典中的所有项或元素，无返回值
+- dict.copy()：返回字典浅复制脚本
+- dict.get(key,default = None)：返回字典中key对象的值，若key不存在，则返回default的值（default默认值为None）
+- dict.pop(key,[ ,default])：若字典中存在key，则删除并返回key对应的value；如果key不存在，且没有给出default的值，则引发KeyError异常
+- dict.setdefault(key,default = None)：若字典中不存在key，则由dict[kry] - default 为赋值
+- dict.update(adict)：将字典adict中键值对添加到dict中
+
 ### 集合
 
 - 唯一性
@@ -1025,12 +1101,6 @@ print(set7)
 tuple2 = tuple(set7)
 print(tuple2)
 ```
-
-
-
-
-
-
 
 
 
